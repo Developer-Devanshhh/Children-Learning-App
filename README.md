@@ -1,25 +1,159 @@
-# Children Learning App — Dyslexia Support
+# LyraLearn — Letter & Number Tracing App for Children
 
-A web application supporting children (roughly ages 6–12) with dyslexia through structured, multi-sensory reading and writing practice.
+> A dyslexia-supportive, multi-sensory learning app where children trace letters and numbers guided by an animated companion character (Lyra). Built with a real-time scoring engine, audio feedback, and a children-first design system.
 
-## What we're building, right now
+---
 
-A focused, three-component MVP:
+## Overview
 
-1. **Psychometric assessment** — an initial test that identifies which reading/writing sub-skills a child needs to work on. (Content and scoring design owned by a teammate; this repo covers delivery, capture, and storage.)
-2. **Kinesthetic canvas tracing engine** — the core deliverable. Children trace English letters (A–Z) and numbers (0–9) on a touchscreen, guided by an animated SVG stroke demo, scored against the actual shape they draw (not a placeholder), and reinforced with sound and — on supported devices — haptic feedback. The idea: engaging multiple senses (visual, auditory, tactile/kinesthetic) in one task builds stronger muscle memory than any single channel alone.
-3. **Gaze/attention monitoring** — a webcam-based module that logs whether a child is engaged during practice, and degrades gracefully (rather than erroring) when their face isn't trackable.
+LyraLearn helps children aged 6–12 practise letter and number formation through:
 
-**We are building the website only, for now.** No native app, no EEG, no non-English scripts, no AI-driven personalization yet — those are explicitly out of scope for this phase and documented separately as future work, not built into the current plan.
+- **Guided SVG animation** — watch the stroke order before you draw
+- **Real-time ink feedback** — ink turns **green** when on-track, **red** when off-track
+- **Waypoint-crossing scorer** — calibrated per age band (6–7, 8–9, 10–12)
+- **Howler.js audio engine** — draw ticks, waypoint chimes, completion fanfare (zero external audio files — all sounds generated via Web Audio API)
+- **Lyra** — a friendly SVG companion character that floats and wiggles
+- **Alphabet & Number tabs** — separate A–Z and 0–9 selection grids
 
-## Documents in this repo
+---
 
-| File | What's in it |
+## Tech Stack
+
+| Layer | Technology |
 |---|---|
-| **`PLAN.md`** | The actual technical plan for the website: stack decisions with justification and alternatives, system architecture, the tracing-accuracy scoring algorithm, the gaze-tracking failure-mode design, privacy/consent notes, and build sequencing. |
-| **`APP.md`** | The later native-app migration plan (Android, via Capacitor). Not being worked on now — kept separate so it doesn't clutter the current website plan, and so it's easy to pick up when that phase actually starts. |
+| Framework | **React 19** + **TypeScript 6** |
+| Build tool | **Vite 8** with `@tailwindcss/vite` plugin |
+| Styling | **Tailwind CSS v4** (CSS-first config via `@theme`) |
+| Drawing | **perfect-freehand** — pressure-aware ink strokes |
+| Audio | **Howler.js** — cross-browser audio with Web Audio API tone generation |
+| State management | **Zustand** (session store, future child profile) |
+| Backend / Auth | **Supabase** (schema defined, integration pending Phase 2) |
+| Icons | **Lucide React** |
+| Linting | **Oxlint** |
+| Font | **Nunito** (Google Fonts — dyslexia-friendly rounded letterforms) |
 
-## Related repos
+---
 
-- **`Dyslexiaaa`** (private) — the research repo this project is grounded in: the SAMR-LD framework analysis, the full evidence review (EEG/neurofeedback, facial recognition, typography, learning styles), the Indic-orthography novelty analysis, and the original four-module architecture this MVP is deliberately scoped down from.
-- **`project-dyslexia`** (private) — an earlier prototype, used here only as a UX/interaction-pattern reference for the tracing engine (see `PLAN.md` §7 for what's worth reusing vs. rebuilding).
+## Project Structure
+
+```
+src/
+├── App.tsx                          # Root two-screen state machine (home → practise)
+├── index.css                        # Tailwind v4 design system tokens + keyframes
+├── main.tsx
+│
+├── data/
+│   └── letter-corpus/
+│       └── graphemes.ts             # A–Z + 0–9 stroke paths, waypoints, start-points
+│
+├── lib/
+│   └── utils.ts                     # cn() helper (clsx + tailwind-merge)
+│
+└── modules/
+    ├── 01-canvas-tracing/
+    │   ├── TracingCanvas.tsx        # Core canvas: guide animation, ink, live feedback
+    │   ├── FeedbackOverlay.tsx      # Post-check result card (qualitative, no numbers)
+    │   └── scorer.ts               # Waypoint-crossing v0 scorer (age-calibrated)
+    │
+    ├── 04-attention-agent/
+    │   └── Lyra.tsx                 # SVG companion character (idle float + wiggle)
+    │
+    ├── 05-session-orchestrator/
+    │   ├── LetterSelector.tsx       # Home screen with A–Z / 0–9 tabs
+    │   └── PractiseScreen.tsx       # Full tracing session screen
+    │
+    └── audio/
+        └── audioEngine.ts          # Howler.js wrapper — all sounds generated at runtime
+```
+
+---
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+# → http://localhost:5173
+
+# Type check
+npx tsc --noEmit
+
+# Lint
+npm run lint
+```
+
+---
+
+## Scoring System
+
+The **waypoint-crossing scorer** (v0) evaluates each traced stroke without showing children any numbers. It returns a qualitative band:
+
+| Band | Meaning | Visual / Audio |
+|---|---|---|
+| **Amazing** | ≥ 80% | Sparkles icon + rising fanfare |
+| **Great** | ≥ 60% | Star icon + fanfare |
+| **Getting there** | ≥ 40% | Smile icon + gentle melody |
+| **Together** | < 40% | Handshake icon + gentle melody |
+
+Score weights: 60% waypoint coverage · 20% start-point accuracy · 20% stroke count match.
+
+Age-band tolerances:
+- 6–7 years: 45 px
+- 8–9 years: 32 px  
+- 10–12 years: 22 px
+
+---
+
+## Real-time Feedback
+
+While drawing, the child receives instant visual + audio feedback:
+
+- **Green ink** + pulsing green proximity ring → pen is within 45 px of the next target waypoint
+- **Red ink** → pen has drifted > 90 px from any waypoint
+- **Waypoint chime** → plays each time a waypoint is crossed
+- **Draw tick** → soft sound every ~120 ms while the pen moves
+- **Stroke-done thunk** → plays when the pen is lifted
+
+---
+
+## Roadmap
+
+### Phase 1 (Current) ✅
+- [x] A–Z + 0–9 stroke corpus with waypoints
+- [x] SVG animated guide with stroke-order animation
+- [x] perfect-freehand ink with real-time colour feedback
+- [x] Waypoint-crossing scorer (age-calibrated)
+- [x] Howler.js audio engine (programmatically generated sounds)
+- [x] Lyra companion character
+- [x] Alphabet / Number tab selection
+
+### Phase 2 (Planned)
+- [ ] Supabase auth + child profiles
+- [ ] Session data logging (stroke timing, pressure, coverage per waypoint)
+- [ ] Offline IndexedDB outbox → sync when online
+- [ ] Lowercase letter corpus
+
+### Phase 3 (Planned)
+- [ ] Psychometric assessment module (Module 02)
+- [ ] Attention monitoring — Lyra calls child's name when idle (Module 04)
+- [ ] Parent / teacher dashboard with session analytics
+- [ ] ML-based personalised difficulty adaptation
+
+---
+
+## Design Principles
+
+- **No numbers shown to children** — all feedback is qualitative and warm
+- **Dyslexia-safe typography** — Nunito font, 0.08 em letter-spacing, 1.75 line-height
+- **Touch-first** — pointer capture, `touch-action: none`, 48 px minimum touch targets
+- **Zero external audio files** — all sounds built from PCM at runtime
+- **Modular architecture** — each feature is an isolated module in `src/modules/`
+
+---
+
+## Contributing
+
+This is a research + prototype project. If you have expertise in dyslexia intervention, Orton-Gillingham methodology, or child UX, contributions and feedback are very welcome.
