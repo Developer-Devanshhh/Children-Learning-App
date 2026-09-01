@@ -7,14 +7,19 @@
  * - Canvas for tracing
  * - Feedback overlay after Check
  * - Back to letter selector
+ *
+ * Phase 2: wires session logging via useSessionStore.
+ * Uses the selected child's age_band for scorer calibration.
  */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TracingCanvas } from '@/modules/01-canvas-tracing/TracingCanvas';
 import { FeedbackOverlay } from '@/modules/01-canvas-tracing/FeedbackOverlay';
 import { Lyra } from '@/modules/04-attention-agent/Lyra';
 import type { Grapheme } from '@/data/letter-corpus/graphemes';
 import type { TracingScore } from '@/modules/01-canvas-tracing/scorer';
+import { useChildStore } from '@/stores/useChildStore';
+import { useSessionStore } from '@/stores/useSessionStore';
 
 interface PractiseScreenProps {
   grapheme: Grapheme;
@@ -23,17 +28,41 @@ interface PractiseScreenProps {
 }
 
 export function PractiseScreen({ grapheme, onBack, onNext }: PractiseScreenProps) {
+  const { selectedChild } = useChildStore();
+  const { startAttempt, logSession } = useSessionStore();
+
   const [score, setScore] = useState<TracingScore | null>(null);
   const [sessionKey, setSessionKey] = useState(0); // remount TracingCanvas on retry
 
-  const handleResult = useCallback((s: TracingScore) => {
+  // Determine age band — fall back to '8-9' in offline mode
+  const ageBand = selectedChild?.age_band ?? '8-9';
+
+  // Start a new attempt counter when grapheme changes or on mount
+  useEffect(() => {
+    startAttempt(grapheme.id);
+  }, [grapheme.id, startAttempt]);
+
+  const handleResult = useCallback(async (s: TracingScore) => {
     setScore(s);
-  }, []);
+
+    // Log to Supabase (or offline outbox) if a child is selected
+    if (selectedChild) {
+      await logSession(selectedChild, {
+        grapheme_id: grapheme.id,
+        score_overall: s.overall,
+        score_coverage: s.perStroke.reduce((acc, p) => acc + p.coverageFraction, 0) / Math.max(s.perStroke.length, 1) * 100,
+        score_start: s.perStroke.filter(p => p.startHit).length / Math.max(s.perStroke.length, 1) * 100,
+        score_stroke_count: s.perStroke.length > 0 ? 100 : 0,
+        band: s.band,
+      });
+    }
+  }, [selectedChild, grapheme.id, logSession]);
 
   const handleTryAgain = useCallback(() => {
     setScore(null);
     setSessionKey(k => k + 1);
-  }, []);
+    startAttempt(grapheme.id); // increment attempt counter
+  }, [grapheme.id, startAttempt]);
 
   const handleNext = useCallback(() => {
     setScore(null);
@@ -58,8 +87,18 @@ export function PractiseScreen({ grapheme, onBack, onNext }: PractiseScreenProps
           ← Back
         </button>
 
-        {/* Lyra — idle in top right */}
-        <Lyra size={52} />
+        {/* Child name badge + Lyra */}
+        <div className="flex items-center gap-2">
+          {selectedChild && (
+            <span
+              className="rounded-full px-3 py-1 text-xs font-bold"
+              style={{ background: 'var(--color-sky-light)', color: 'var(--color-sky-dark)' }}
+            >
+              {selectedChild.name}
+            </span>
+          )}
+          <Lyra size={48} />
+        </div>
       </div>
 
       {/* Letter name */}
@@ -81,7 +120,7 @@ export function PractiseScreen({ grapheme, onBack, onNext }: PractiseScreenProps
           Trace the letter <strong>{grapheme.label}</strong>
         </p>
         <p style={{ color: 'var(--color-ink-muted)', fontSize: '0.78rem', opacity: 0.75 }}>
-          Follow the coloured dots → then trace over the guide!
+          Follow the coloured dots, then trace over the guide!
         </p>
       </div>
 
@@ -90,7 +129,7 @@ export function PractiseScreen({ grapheme, onBack, onNext }: PractiseScreenProps
         <TracingCanvas
           key={sessionKey}
           grapheme={grapheme}
-          ageBand="8-9"
+          ageBand={ageBand}
           onResult={handleResult}
         />
       ) : (
