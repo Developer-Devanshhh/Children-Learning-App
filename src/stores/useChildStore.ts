@@ -62,14 +62,14 @@ export const useChildStore = create<ChildState>()(
 
         if (error) { set({ loading: false, error: error.message }); return null; }
         const child = data as DbChild;
-        set((s) => ({ children: [...s.children, child], loading: false }));
+        set((s: ChildState) => ({ children: [...s.children, child], loading: false }));
         return child;
       },
     }),
     {
       name: 'lyralearn-child',
       // Only persist the selected child (avoid stale list)
-      partialise: (state: ChildState) => ({ selectedChild: state.selectedChild }),
-    } as Parameters<typeof persist>[1],
-  ),
+      partialize: (state) => ({ selectedChild: state.selectedChild }) as any,
+    }
+  )
 );
