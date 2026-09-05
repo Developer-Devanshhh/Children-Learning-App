@@ -47,12 +47,17 @@ export function PractiseScreen({ grapheme, onBack, onNext }: PractiseScreenProps
 
     // Log to Supabase (or offline outbox) if a child is selected
     if (selectedChild) {
+      const strokeList = s.strokes;
+      const strokeCount = Math.max(strokeList.length, 1);
+      const coverage = strokeList.reduce((acc: number, p) => acc + p.coverageFraction, 0) / strokeCount * 100;
+      const startHit = strokeList.filter((p) => p.startPointHit).length / strokeCount * 100;
+
       await logSession(selectedChild, {
         grapheme_id: grapheme.id,
         score_overall: s.overall,
-        score_coverage: s.strokes.reduce((acc: number, p) => acc + p.coverageFraction, 0) / Math.max(s.strokes.length, 1) * 100,
-        score_start: s.strokes.filter(p => p.startPointHit).length / Math.max(s.strokes.length, 1) * 100,
-        score_stroke_count: s.strokes.length > 0 ? 100 : 0,
+        score_coverage: coverage,
+        score_start: startHit,
+        score_stroke_count: strokeList.length > 0 ? 100 : 0,
         band: s.band,
       });
     }

@@ -21,8 +21,10 @@ interface ChildState {
   addChild: (parentId: string, name: string, ageBand: DbChild['age_band']) => Promise<DbChild | null>;
 }
 
-export const useChildStore = create<ChildState>()(
-  persist(
+type PersistedChild = { selectedChild: DbChild | null };
+
+export const useChildStore = create(
+  persist<ChildState, [], [], PersistedChild>(
     (set, get) => ({
       children: [],
       selectedChild: null,
@@ -39,37 +41,46 @@ export const useChildStore = create<ChildState>()(
           .order('created_at', { ascending: true });
 
         if (error) { set({ loading: false, error: error.message }); return; }
-        set({ children: (data ?? []) as DbChild[], loading: false });
+        const list = (data ?? []) as DbChild[];
+        set({ children: list, loading: false });
 
         // Re-validate selectedChild if it came from persisted storage
         const current = get().selectedChild;
-        if (current && !(data ?? []).find((c) => c.id === current.id)) {
+        if (current && !list.find((c) => c.id === current.id)) {
           set({ selectedChild: null });
         }
       },
 
       selectChild: (child) => set({ selectedChild: child }),
-      clearChild: ()  => set({ selectedChild: null }),
+      clearChild: () => set({ selectedChild: null }),
 
       addChild: async (parentId, name, ageBand) => {
         if (!supabase) return null;
         set({ loading: true, error: null });
-        const { data, error } = await supabase
-          .from('children')
-          .insert({ parent_id: parentId, name: name.trim(), age_band: ageBand, avatar_seed: 'lyra' })
+
+        type ChildInsert = { parent_id: string; name: string; age_band: DbChild['age_band']; avatar_seed: string };
+        const insertPayload: ChildInsert = {
+          parent_id: parentId,
+          name: name.trim(),
+          age_band: ageBand,
+          avatar_seed: 'lyra',
+        };
+
+        const { data, error } = await (supabase
+          .from('children') as any)
+          .insert(insertPayload)
           .select()
           .single();
 
-        if (error) { set({ loading: false, error: error.message }); return null; }
+        if (error) { set({ loading: false, error: (error as { message: string }).message }); return null; }
         const child = data as DbChild;
-        set((s: ChildState) => ({ children: [...s.children, child], loading: false }));
+        set((s) => ({ children: [...s.children, child], loading: false }));
         return child;
       },
     }),
     {
       name: 'lyralearn-child',
-      // Only persist the selected child (avoid stale list)
-      partialize: (state) => ({ selectedChild: state.selectedChild }) as any,
-    }
-  )
+      partialize: (state) => ({ selectedChild: state.selectedChild }),
+    },
+  ),
 );
