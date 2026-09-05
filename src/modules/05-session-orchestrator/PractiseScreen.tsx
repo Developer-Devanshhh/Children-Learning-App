@@ -50,9 +50,9 @@ export function PractiseScreen({ grapheme, onBack, onNext }: PractiseScreenProps
       await logSession(selectedChild, {
         grapheme_id: grapheme.id,
         score_overall: s.overall,
-        score_coverage: s.perStroke.reduce((acc, p) => acc + p.coverageFraction, 0) / Math.max(s.perStroke.length, 1) * 100,
-        score_start: s.perStroke.filter(p => p.startHit).length / Math.max(s.perStroke.length, 1) * 100,
-        score_stroke_count: s.perStroke.length > 0 ? 100 : 0,
+        score_coverage: s.strokes.reduce((acc: number, p) => acc + p.coverageFraction, 0) / Math.max(s.strokes.length, 1) * 100,
+        score_start: s.strokes.filter(p => p.startPointHit).length / Math.max(s.strokes.length, 1) * 100,
+        score_stroke_count: s.strokes.length > 0 ? 100 : 0,
         band: s.band,
       });
     }
