@@ -58,7 +58,7 @@ export default function App() {
       setScreen('auth');
     } else if (!selectedChild) {
       setScreen('pick-child');
-    } else if (screen === 'auth' || screen === 'pick-child' || screen === 'loading') {
+    } else if (screen === 'loading' || screen === 'auth') {
       setScreen('home');
     }
   }, [authLoading, session, selectedChild, screen]);
@@ -116,7 +116,10 @@ export default function App() {
       )}
 
       {screen === 'home' && (
-        <LetterSelector onSelect={handleSelect} />
+        <LetterSelector
+          onSelect={handleSelect}
+          onSwitchProfile={() => setScreen('pick-child')}
+        />
       )}
 
       {screen === 'practise' && (

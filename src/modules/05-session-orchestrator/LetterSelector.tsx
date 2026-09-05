@@ -10,11 +10,13 @@
  */
 
 import { useState } from 'react';
+import { Settings } from 'lucide-react';
 import { GRAPHEMES } from '@/data/letter-corpus/graphemes';
 import { Lyra } from '@/modules/04-attention-agent/Lyra';
 
 interface LetterSelectorProps {
   onSelect: (id: string) => void;
+  onSwitchProfile?: () => void;
 }
 
 type Tab = 'letters' | 'numbers';
@@ -22,7 +24,7 @@ type Tab = 'letters' | 'numbers';
 const LETTERS = GRAPHEMES.filter(g => /^[A-Z]$/.test(g.id));
 const NUMBERS  = GRAPHEMES.filter(g => /^[0-9]$/.test(g.id));
 
-export function LetterSelector({ onSelect }: LetterSelectorProps) {
+export function LetterSelector({ onSelect, onSwitchProfile }: LetterSelectorProps) {
   const [activeTab, setActiveTab] = useState<Tab>('letters');
   const items = activeTab === 'letters' ? LETTERS : NUMBERS;
 
@@ -30,16 +32,29 @@ export function LetterSelector({ onSelect }: LetterSelectorProps) {
     <div className="flex flex-col w-full max-w-sm mx-auto px-4 pt-5 pb-10 animate-fade-in" style={{ minHeight: '100dvh' }}>
 
       {/* Header */}
-      <div className="flex items-center gap-3 mb-5">
-        <Lyra size={60} />
-        <div>
-          <h1 className="text-3xl" style={{ color: 'var(--color-ink)', lineHeight: 1.1 }}>
-            LyraLearn
-          </h1>
-          <p style={{ color: 'var(--color-ink-muted)', fontSize: '0.85rem', marginTop: 2 }}>
-            Pick something to practise
-          </p>
+      <div className="flex items-center justify-between mb-5 w-full">
+        <div className="flex items-center gap-3">
+          <Lyra size={60} />
+          <div>
+            <h1 className="text-3xl" style={{ color: 'var(--color-ink)', lineHeight: 1.1 }}>
+              LyraLearn
+            </h1>
+            <p style={{ color: 'var(--color-ink-muted)', fontSize: '0.85rem', marginTop: 2 }}>
+              Pick something to practise
+            </p>
+          </div>
         </div>
+        
+        {onSwitchProfile && (
+          <button
+            onClick={onSwitchProfile}
+            className="flex items-center justify-center rounded-2xl touch-target transition-all active:scale-95"
+            style={{ width: 44, height: 44, background: 'var(--color-surface)', border: '2px solid hsl(225 15% 90%)', color: 'var(--color-ink-muted)' }}
+            aria-label="Switch Profile or Settings"
+          >
+            <Settings size={22} />
+          </button>
+        )}
       </div>
 
       {/* Tab bar */}

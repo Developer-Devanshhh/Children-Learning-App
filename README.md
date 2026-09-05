@@ -19,18 +19,18 @@ LyraLearn helps children aged 6–12 practise letter and number formation throug
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | **React 19** + **TypeScript 6** |
-| Build tool | **Vite 8** with `@tailwindcss/vite` plugin |
-| Styling | **Tailwind CSS v4** (CSS-first config via `@theme`) |
-| Drawing | **perfect-freehand** — pressure-aware ink strokes |
-| Audio | **Howler.js** — cross-browser audio with Web Audio API tone generation |
-| State management | **Zustand** (session store, future child profile) |
-| Backend / Auth | **Supabase** (schema defined, integration pending Phase 2) |
-| Icons | **Lucide React** |
-| Linting | **Oxlint** |
-| Font | **Nunito** (Google Fonts — dyslexia-friendly rounded letterforms) |
+| Layer            | Technology                                                                    |
+| ---------------- | ----------------------------------------------------------------------------- |
+| Framework        | **React 19** + **TypeScript 6**                                   |
+| Build tool       | **Vite 8** with `@tailwindcss/vite` plugin                            |
+| Styling          | **Tailwind CSS v4** (CSS-first config via `@theme`)                   |
+| Drawing          | **perfect-freehand** — pressure-aware ink strokes                      |
+| Audio            | **Howler.js** — cross-browser audio with Web Audio API tone generation |
+| State management | **Zustand** (session store, future child profile)                       |
+| Backend / Auth   | **Supabase** (schema defined, integration pending Phase 2)              |
+| Icons            | **Lucide React**                                                        |
+| Linting          | **Oxlint**                                                              |
+| Font             | **Nunito** (Google Fonts — dyslexia-friendly rounded letterforms)      |
 
 ---
 
@@ -91,18 +91,19 @@ npm run lint
 
 The **waypoint-crossing scorer** (v0) evaluates each traced stroke without showing children any numbers. It returns a qualitative band:
 
-| Band | Meaning | Visual / Audio |
-|---|---|---|
-| **Amazing** | ≥ 80% | Sparkles icon + rising fanfare |
-| **Great** | ≥ 60% | Star icon + fanfare |
-| **Getting there** | ≥ 40% | Smile icon + gentle melody |
-| **Together** | < 40% | Handshake icon + gentle melody |
+| Band                    | Meaning | Visual / Audio                 |
+| ----------------------- | ------- | ------------------------------ |
+| **Amazing**       | ≥ 80%  | Sparkles icon + rising fanfare |
+| **Great**         | ≥ 60%  | Star icon + fanfare            |
+| **Getting there** | ≥ 40%  | Smile icon + gentle melody     |
+| **Together**      | < 40%   | Handshake icon + gentle melody |
 
 Score weights: 60% waypoint coverage · 20% start-point accuracy · 20% stroke count match.
 
 Age-band tolerances:
+
 - 6–7 years: 45 px
-- 8–9 years: 32 px  
+- 8–9 years: 32 px
 - 10–12 years: 22 px
 
 ---
@@ -122,21 +123,24 @@ While drawing, the child receives instant visual + audio feedback:
 ## Roadmap
 
 ### Phase 1 (Current) ✅
-- [x] A–Z + 0–9 stroke corpus with waypoints
-- [x] SVG animated guide with stroke-order animation
-- [x] perfect-freehand ink with real-time colour feedback
-- [x] Waypoint-crossing scorer (age-calibrated)
-- [x] Howler.js audio engine (programmatically generated sounds)
-- [x] Lyra companion character
-- [x] Alphabet / Number tab selection
+
+- [X] A–Z + 0–9 stroke corpus with waypoints
+- [X] SVG animated guide with stroke-order animation
+- [X] perfect-freehand ink with real-time colour feedback
+- [X] Waypoint-crossing scorer (age-calibrated)
+- [X] Howler.js audio engine (programmatically generated sounds)
+- [X] Lyra companion character
+- [X] Alphabet / Number tab selection
 
 ### Phase 2 (Planned)
+
 - [ ] Supabase auth + child profiles
 - [ ] Session data logging (stroke timing, pressure, coverage per waypoint)
 - [ ] Offline IndexedDB outbox → sync when online
 - [ ] Lowercase letter corpus
 
 ### Phase 3 (Planned)
+
 - [ ] Psychometric assessment module (Module 02)
 - [ ] Attention monitoring — Lyra calls child's name when idle (Module 04)
 - [ ] Parent / teacher dashboard with session analytics
