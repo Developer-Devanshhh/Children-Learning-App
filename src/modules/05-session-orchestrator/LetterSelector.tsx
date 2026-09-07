@@ -13,10 +13,15 @@ import { useState } from 'react';
 import { Settings } from 'lucide-react';
 import { GRAPHEMES } from '@/data/letter-corpus/graphemes';
 import { Lyra } from '@/modules/04-attention-agent/Lyra';
+import { AssessmentLauncher } from '@/modules/02-psychometric-assessment/AssessmentLauncher';
+import type { DbChild } from '@/lib/supabase';
 
 interface LetterSelectorProps {
   onSelect: (id: string) => void;
   onSwitchProfile?: () => void;
+  onLaunchAssessment?: () => void;
+  child?: DbChild | null;
+  hasCompletedAssessment?: boolean;
 }
 
 type Tab = 'letters' | 'numbers';
@@ -24,7 +29,13 @@ type Tab = 'letters' | 'numbers';
 const LETTERS = GRAPHEMES.filter(g => /^[A-Z]$/.test(g.id));
 const NUMBERS  = GRAPHEMES.filter(g => /^[0-9]$/.test(g.id));
 
-export function LetterSelector({ onSelect, onSwitchProfile }: LetterSelectorProps) {
+export function LetterSelector({
+  onSelect,
+  onSwitchProfile,
+  onLaunchAssessment,
+  child,
+  hasCompletedAssessment,
+}: LetterSelectorProps) {
   const [activeTab, setActiveTab] = useState<Tab>('letters');
   const items = activeTab === 'letters' ? LETTERS : NUMBERS;
 
@@ -56,6 +67,15 @@ export function LetterSelector({ onSelect, onSwitchProfile }: LetterSelectorProp
           </button>
         )}
       </div>
+
+      {/* Assessment Launcher Invitation Banner */}
+      {onLaunchAssessment && (
+        <AssessmentLauncher
+          child={child}
+          onLaunchAssessment={onLaunchAssessment}
+          hasCompletedAssessment={hasCompletedAssessment}
+        />
+      )}
 
       {/* Tab bar */}
       <div
