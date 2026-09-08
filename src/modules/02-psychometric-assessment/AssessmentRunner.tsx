@@ -2,14 +2,17 @@
  * AssessmentRunner.tsx — Master Orchestrator for Psychometric Assessment Stages
  *
  * Coordinates:
- *   - Current stage mounting (Stages 01–04 in Phase 3, subsequent stages in Phases 4-5)
+ *   - Stages 01–04: Phonological & Reading Foundations
+ *   - Stage 05: Reading Fluency
+ *   - Midway Break: Rest & Relaxation Screen
+ *   - Stages 06–07: Reading Comprehension & Spelling
+ *   - Stages 08–10: Cognitive & Executive Functions (RAN, Working Memory, Attention)
  *   - Inter-island celebration cheer cards
  *   - Exit confirmation safeguards
- *   - Assessment store stage advancement
  */
 
 import { useState } from 'react';
-import { Sparkles, ArrowRight, Home } from 'lucide-react';
+import { Sparkles, ArrowRight, Home, Trophy, Award } from 'lucide-react';
 import { Lyra } from '@/modules/04-attention-agent/Lyra';
 import { audioEngine } from '@/modules/audio/audioEngine';
 import { useAssessmentStore } from '@/stores/useAssessmentStore';
@@ -17,6 +20,13 @@ import { Stage01LetterKnowledge } from './stages/Stage01LetterKnowledge';
 import { Stage02PhonologicalAwareness } from './stages/Stage02PhonologicalAwareness';
 import { Stage03PhonologicalDecoding } from './stages/Stage03PhonologicalDecoding';
 import { Stage04WordRecognition } from './stages/Stage04WordRecognition';
+import { Stage05ReadingFluency } from './stages/Stage05ReadingFluency';
+import { MidwayBreakScreen } from './stages/MidwayBreakScreen';
+import { Stage06ReadingComprehension } from './stages/Stage06ReadingComprehension';
+import { Stage07Spelling } from './stages/Stage07Spelling';
+import { Stage08RapidNaming } from './stages/Stage08RapidNaming';
+import { Stage09WorkingMemory } from './stages/Stage09WorkingMemory';
+import { Stage10AttentionProcessing } from './stages/Stage10AttentionProcessing';
 import type { DbChild } from '@/lib/supabase';
 
 interface AssessmentRunnerProps {
@@ -31,7 +41,7 @@ const STAGE_NAMES = [
   'Island 3: Alien Word Cave 👾',
   'Island 4: Word Safari 🦁',
   'Island 5: Fluency Falls 🏄',
-  'Picnic Rest Break 🥪',
+  'Midway Picnic Rest Break 🥪',
   'Island 6: Story Castle 🏰',
   'Island 7: Spell Forge ⚒️',
   'Island 8: Speed Mountain ⚡',
@@ -61,8 +71,8 @@ export function AssessmentRunner({
   // ── Inter-Stage Cheer Screen ──────────────────────────────────────────
   if (showStageCheer) {
     const completedStageName = STAGE_NAMES[currentStageIndex] ?? `Island ${currentStageIndex + 1}`;
-    const nextStageName = STAGE_NAMES[currentStageIndex + 1] ?? 'Next Island';
-    const isPhase3Cap = currentStageIndex >= 3; // Cap after Stage 04 in Phase 3
+    const nextStageName = STAGE_NAMES[currentStageIndex + 1] ?? 'Final Adventure Hub';
+    const isAllCompleted = currentStageIndex >= 10;
 
     return (
       <div className="flex flex-col items-center justify-center min-h-[85dvh] max-w-md mx-auto p-6 text-center gap-6 animate-scale-in">
@@ -71,13 +81,13 @@ export function AssessmentRunner({
             <Lyra size={72} />
           </div>
           <div className="absolute -top-1 -right-1 bg-green-500 text-white p-1.5 rounded-full shadow">
-            <Sparkles size={18} />
+            {isAllCompleted ? <Trophy size={18} /> : <Sparkles size={18} />}
           </div>
         </div>
 
         <div className="space-y-1.5">
           <span className="text-xs font-black uppercase tracking-wider text-green-700 bg-green-100 px-3 py-1 rounded-full">
-            Island Quest Complete! 🌟
+            {isAllCompleted ? 'Grand Quest Accomplished! 🏆' : 'Island Quest Complete! 🌟'}
           </span>
           <h2 className="text-2xl font-black text-slate-800 pt-1">
             Super Explorer, {child.name}!
@@ -87,11 +97,16 @@ export function AssessmentRunner({
           </p>
         </div>
 
-        {isPhase3Cap ? (
+        {isAllCompleted ? (
           <div className="space-y-4 w-full pt-2">
-            <div className="p-4 rounded-3xl bg-purple-50 border border-purple-200 text-xs text-purple-900 leading-relaxed font-medium">
-              🎉 <strong>Phases 3 Milestones (Stages 01–04) Completed & Logged!</strong><br />
-              Stages 05–10 and the scoring engine will unlock in the upcoming phases.
+            <div className="p-4 rounded-3xl bg-emerald-50 border-2 border-emerald-200 text-xs text-emerald-950 leading-relaxed font-medium text-left space-y-1.5">
+              <div className="flex items-center gap-1.5 font-black text-emerald-800 text-sm">
+                <Award size={18} />
+                <span>All 10 Reading & Cognitive Islands Explored!</span>
+              </div>
+              <p>
+                Your complete learning adventure responses have been safely saved. Let's look at your personalized learning map!
+              </p>
             </div>
             <button
               onClick={onFinishAssessment}
@@ -100,7 +115,7 @@ export function AssessmentRunner({
                 background: 'linear-gradient(135deg, var(--color-grass, #22c55e), var(--color-sky, #38bdf8))',
               }}
             >
-              <span>Finish Assessment Checkpoint</span>
+              <span>Unlock My Learning Adventure Map!</span>
               <ArrowRight size={18} />
             </button>
           </div>
@@ -162,32 +177,72 @@ export function AssessmentRunner({
         </div>
       )}
 
+      {/* Stage 01: Letter Knowledge */}
       {currentStageIndex === 0 && (
         <Stage01LetterKnowledge onStageComplete={handleStageCompleted} />
       )}
 
+      {/* Stage 02: Phonological Awareness */}
       {currentStageIndex === 1 && (
         <Stage02PhonologicalAwareness onStageComplete={handleStageCompleted} />
       )}
 
+      {/* Stage 03: Phonological Decoding */}
       {currentStageIndex === 2 && (
         <Stage03PhonologicalDecoding onStageComplete={handleStageCompleted} />
       )}
 
+      {/* Stage 04: Word Recognition */}
       {currentStageIndex === 3 && (
         <Stage04WordRecognition onStageComplete={handleStageCompleted} />
       )}
 
-      {currentStageIndex > 3 && (
+      {/* Stage 05: Reading Fluency */}
+      {currentStageIndex === 4 && (
+        <Stage05ReadingFluency onStageComplete={handleStageCompleted} />
+      )}
+
+      {/* Midway Picnic Rest Break */}
+      {currentStageIndex === 5 && (
+        <MidwayBreakScreen child={child} onContinue={handleContinueNextStage} />
+      )}
+
+      {/* Stage 06: Reading Comprehension */}
+      {currentStageIndex === 6 && (
+        <Stage06ReadingComprehension onStageComplete={handleStageCompleted} />
+      )}
+
+      {/* Stage 07: Spelling */}
+      {currentStageIndex === 7 && (
+        <Stage07Spelling onStageComplete={handleStageCompleted} />
+      )}
+
+      {/* Stage 08: Rapid Automatized Naming (RAN) */}
+      {currentStageIndex === 8 && (
+        <Stage08RapidNaming onStageComplete={handleStageCompleted} />
+      )}
+
+      {/* Stage 09: Working Memory */}
+      {currentStageIndex === 9 && (
+        <Stage09WorkingMemory onStageComplete={handleStageCompleted} />
+      )}
+
+      {/* Stage 10: Sustained Attention & Processing Speed */}
+      {currentStageIndex === 10 && (
+        <Stage10AttentionProcessing onStageComplete={handleStageCompleted} />
+      )}
+
+      {/* Completion Fallback */}
+      {currentStageIndex > 10 && (
         <div className="flex flex-col items-center justify-center min-h-[70vh] p-6 text-center gap-4 animate-fade-in">
           <h3 className="text-xl font-black text-slate-800">
-            Stages 01–04 Completed! 🌟
+            All 10 Adventure Islands Completed! 🌟
           </h3>
           <button
             onClick={onFinishAssessment}
             className="px-6 py-3 rounded-2xl bg-sky-600 text-white font-bold text-sm shadow-md cursor-pointer"
           >
-            Return to Learning Hub
+            Unlock Learning Profile
           </button>
         </div>
       )}

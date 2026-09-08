@@ -6,12 +6,13 @@
  *   - Distinguishes accurate orthography from phonetically plausible misspellings (e.g. SAID vs SED)
  *   - Tests high-frequency regular & irregular sight words with increasing grade-band complexity
  *
- * Adaptive Logic:
+ * Adaptive Logic (Centralized via adaptiveEngine):
  *   - Starts at Medium tier items.
+ *   - Minimum 4 scored items required before ceiling/floor rule can terminate.
  *   - 2 consecutive correct -> advances to Hard tier.
  *   - 2 consecutive incorrect -> branches to Easy tier.
- *   - Ceiling rule: 3 consecutive correct at Hard.
- *   - Floor rule: 3 consecutive incorrect at Easy.
+ *   - Ceiling rule: 3 consecutive correct at Hard (only after >= 4 valid scored items).
+ *   - Floor rule: 3 consecutive incorrect at Easy (only after >= 4 valid scored items).
  *   - Practice items are fully separated and un-scored.
  */
 
@@ -21,6 +22,7 @@ import { Lyra } from '@/modules/04-attention-agent/Lyra';
 import { audioEngine } from '@/modules/audio/audioEngine';
 import { STAGE_04_ITEMS, type AssessmentCorpusItem } from '@/data/assessmentCorpus';
 import { useAssessmentStore } from '@/stores/useAssessmentStore';
+import { evaluateAdaptiveStep, ensureQueueSufficiency, DEFAULT_ADAPTIVE_CONFIG } from '@/lib/adaptiveEngine';
 
 interface Stage04Props {
   onStageComplete: () => void;
@@ -44,6 +46,7 @@ export function Stage04WordRecognition({ onStageComplete }: Stage04Props) {
 
   const consecutiveCorrectRef = useRef(0);
   const consecutiveIncorrectRef = useRef(0);
+  const validScoredCountRef = useRef(0);
   const itemStartTimeRef = useRef<number>(Date.now());
   const attemptsCountRef = useRef<number>(0);
 
@@ -86,7 +89,7 @@ export function Stage04WordRecognition({ onStageComplete }: Stage04Props) {
 
     const now = Date.now();
     const latency = now - itemStartTimeRef.current;
-    const isAccidentalTap = latency < 300;
+    const isAccidentalTap = latency < DEFAULT_ADAPTIVE_CONFIG.accidentalTouchThresholdMs;
 
     attemptsCountRef.current += 1;
     setSelectedOptionId(option.id);
@@ -98,7 +101,7 @@ export function Stage04WordRecognition({ onStageComplete }: Stage04Props) {
       audioEngine.playEncourage();
     }
 
-    // Record response telemetry
+    // Record response telemetry (TASK 2)
     recordResponse({
       domain: 'word_recognition',
       task_type: currentItem.taskType,
@@ -118,41 +121,35 @@ export function Stage04WordRecognition({ onStageComplete }: Stage04Props) {
       error_classification: option.errorType ?? null,
     });
 
-    // Adaptive tracking for scored items
-    // PROVISIONAL thresholds — not norm-referenced; adjust after pilot data collection.
-    if (!currentItem.isPractice) {
-      if (option.isCorrect) {
-        consecutiveCorrectRef.current += 1;
-        consecutiveIncorrectRef.current = 0;
-      } else {
-        consecutiveIncorrectRef.current += 1;
-        consecutiveCorrectRef.current = 0;
-      }
+    // Centralized adaptive evaluation (TASK 1)
+    const evalResult = evaluateAdaptiveStep({
+      isPractice: currentItem.isPractice,
+      isCorrect: option.isCorrect,
+      isSkipped: false,
+      responseTimeMs: latency,
+      currentTier: activeTier,
+      consecutiveCorrect: consecutiveCorrectRef.current,
+      consecutiveIncorrect: consecutiveIncorrectRef.current,
+      validScoredCount: validScoredCountRef.current,
+    });
 
-      // Tier promotion: ≥2 consecutive correct → escalate to Hard (PROVISIONAL)
-      if (consecutiveCorrectRef.current >= 2 && activeTier !== 'hard') {
-        const hardItems = STAGE_04_ITEMS.filter((i) => !i.isPractice && i.difficultyTier === 'hard');
-        setQueue((prev) => [...prev, ...hardItems.filter((h) => !prev.some((p) => p.id === h.id))]);
-        setActiveTier('hard');
-      // Tier demotion: ≥2 consecutive incorrect → branch to Easy (PROVISIONAL)
-      } else if (consecutiveIncorrectRef.current >= 2 && activeTier !== 'easy') {
-        const easyItems = STAGE_04_ITEMS.filter((i) => !i.isPractice && i.difficultyTier === 'easy');
-        setQueue((prev) => [...prev, ...easyItems.filter((e) => !prev.some((p) => p.id === e.id))]);
-        setActiveTier('easy');
-      }
+    validScoredCountRef.current = evalResult.nextValidScoredCount;
+    consecutiveCorrectRef.current = evalResult.nextConsecutiveCorrect;
+    consecutiveIncorrectRef.current = evalResult.nextConsecutiveIncorrect;
+
+    if (evalResult.shouldEscalateToHard) {
+      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_04_ITEMS, 'hard'));
+      setActiveTier('hard');
+    } else if (evalResult.shouldBranchToEasy) {
+      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_04_ITEMS, 'easy'));
+      setActiveTier('easy');
+    } else if (queue.length - (activeItemIndex + 1) + evalResult.nextValidScoredCount < DEFAULT_ADAPTIVE_CONFIG.minScoredItems) {
+      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_04_ITEMS, activeTier === 'hard' ? 'easy' : 'hard'));
     }
-
-    // Snapshot ref values NOW to avoid stale-closure reads inside setTimeout
-    const snapshotCorrect = consecutiveCorrectRef.current;
-    const snapshotIncorrect = consecutiveIncorrectRef.current;
-    const snapshotTier = activeTier;
 
     // Advance after brief pause
     setTimeout(() => {
-      const isCeilingMet = snapshotTier === 'hard' && snapshotCorrect >= 3; // PROVISIONAL
-      const isFloorMet = snapshotTier === 'easy' && snapshotIncorrect >= 3; // PROVISIONAL
-
-      if (activeItemIndex + 1 < queue.length && !isCeilingMet && !isFloorMet) {
+      if (activeItemIndex + 1 < queue.length && !evalResult.shouldTerminateStage) {
         setActiveItemIndex((idx) => idx + 1);
       } else {
         onStageComplete();
@@ -180,6 +177,10 @@ export function Stage04WordRecognition({ onStageComplete }: Stage04Props) {
       error_classification: 'SKIPPED_BY_USER',
     });
 
+    if (queue.length - (activeItemIndex + 1) + validScoredCountRef.current < DEFAULT_ADAPTIVE_CONFIG.minScoredItems) {
+      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_04_ITEMS, activeTier === 'hard' ? 'easy' : 'hard'));
+    }
+
     if (activeItemIndex + 1 < queue.length) {
       setActiveItemIndex((idx) => idx + 1);
     } else {
@@ -196,7 +197,7 @@ export function Stage04WordRecognition({ onStageComplete }: Stage04Props) {
   }
 
   const scoredIndex = queue.slice(0, activeItemIndex + 1).filter((i) => !i.isPractice).length;
-  const totalScored = queue.filter((i) => !i.isPractice).length;
+  const totalScored = Math.max(queue.filter((i) => !i.isPractice).length, DEFAULT_ADAPTIVE_CONFIG.minScoredItems);
 
   return (
     <div className="flex flex-col w-full max-w-lg mx-auto px-4 py-5 gap-5 animate-fade-in" style={{ minHeight: '100dvh' }}>

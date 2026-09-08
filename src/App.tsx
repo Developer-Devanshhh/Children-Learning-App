@@ -1,25 +1,22 @@
 /**
- * App.tsx — root router / shell
+ * App.tsx — ReadQuest root router & shell
  *
  * Screen state machine:
- *   'auth'                → AuthScreen              (parent signs in)
- *   'pick-child'          → ChildSelector           (select / create child profile)
- *   'home'                → LetterSelector          (A–Z / 0–9 tabs + Assessment launcher)
- *   'practise'            → PractiseScreen          (tracing session)
- *   'consent'             → AssessmentConsent       (parental consent & screening disclaimer)
- *   'assessment-intro'    → AssessmentIntro         (adventure mission briefing & audio check)
- *   'assessment-practice' → AssessmentPractice      (warm-up tutorial for tap, listen, drag)
- *   'assessment'          → Active Assessment Stage (Phases 3-5)
- *
- * On load:
- *   no Supabase URL          → skip auth+child → 'home'  (offline/dev mode)
- *   session == null          → 'auth'
- *   session && child == null → 'pick-child'
- *   session && child         → 'home'
+ *   'home'                → AdventureLandingHero        (Vibrant colourful landing page matching mockup)
+ *   'consent'             → AssessmentConsent           (Parental consent & screening disclaimer)
+ *   'assessment-intro'    → AssessmentIntro             (Adventure mission briefing & audio check with Lyra)
+ *   'assessment-practice' → AssessmentPractice          (Interactive warm-up tutorial)
+ *   'assessment'          → AssessmentRunner            (10-stage psychometric screening adventure)
+ *   'assessment-results'  → AssessmentResultsDashboard  (Scores & Superpowers Trophy Room)
+ *   'alphabet-hub'        → LetterSelector              (A–Z / 0–9 Haptic Tracing Hub - unlocked after assessment)
+ *   'practise'            → PractiseScreen              (Haptic alphabet tracing canvas)
+ *   'pick-child'          → ChildSelector               (Child profile manager)
+ *   'auth'                → AuthScreen                  (Parent login/signup)
  */
 
 import { useEffect, useState, useCallback } from 'react';
 import { GRAPHEMES, getGrapheme } from '@/data/letter-corpus/graphemes';
+import { AdventureLandingHero } from '@/modules/02-psychometric-assessment/AdventureLandingHero';
 import { LetterSelector } from '@/modules/05-session-orchestrator/LetterSelector';
 import { PractiseScreen } from '@/modules/05-session-orchestrator/PractiseScreen';
 import { AuthScreen } from '@/modules/06-auth/AuthScreen';
@@ -28,10 +25,12 @@ import { AssessmentConsent } from '@/modules/02-psychometric-assessment/Assessme
 import { AssessmentIntro } from '@/modules/02-psychometric-assessment/AssessmentIntro';
 import { AssessmentPractice } from '@/modules/02-psychometric-assessment/AssessmentPractice';
 import { AssessmentRunner } from '@/modules/02-psychometric-assessment/AssessmentRunner';
+import { AssessmentResultsDashboard } from '@/modules/02-psychometric-assessment/AssessmentResultsDashboard';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useChildStore } from '@/stores/useChildStore';
 import { useAssessmentStore } from '@/stores/useAssessmentStore';
 import { registerOutboxSyncListener } from '@/lib/offlineOutbox';
+import { scoreAssessmentSession, type MultidimensionalAssessmentResult } from '@/lib/psychometricScorer';
 import type { DbChild } from '@/lib/supabase';
 
 type Screen =
@@ -39,11 +38,13 @@ type Screen =
   | 'auth'
   | 'pick-child'
   | 'home'
+  | 'alphabet-hub'
   | 'practise'
   | 'consent'
   | 'assessment-intro'
   | 'assessment-practice'
-  | 'assessment';
+  | 'assessment'
+  | 'assessment-results';
 
 const HAS_SUPABASE = Boolean(import.meta.env.VITE_SUPABASE_URL);
 
@@ -60,28 +61,27 @@ const GUEST_CHILD: DbChild = {
 export default function App() {
   const { session, loading: authLoading, initialize } = useAuthStore();
   const { selectedChild } = useChildStore();
-  const { startAssessment, reset: resetAssessment } = useAssessmentStore();
+  const { startAssessment, finishAssessment, reset: resetAssessment, itemResponses } = useAssessmentStore();
 
   const [screen, setScreen] = useState<Screen>('loading');
   const [selectedId, setSelectedId] = useState<string>('A');
   const [hasConsented, setHasConsented] = useState<boolean>(false);
+  const [assessmentResults, setAssessmentResults] = useState<MultidimensionalAssessmentResult | null>(null);
 
   const activeChild = selectedChild ?? GUEST_CHILD;
 
   // ── Boot ─────────────────────────────────────────────────────────────
   useEffect(() => {
     void initialize();
-    // Register offline outbox flush on reconnect
     const unregister = registerOutboxSyncListener();
     return unregister;
   }, [initialize]);
 
   // ── Routing ───────────────────────────────────────────────────────────
   useEffect(() => {
-    if (authLoading) return; // wait for Supabase session restore
+    if (authLoading) return;
 
     if (!HAS_SUPABASE) {
-      // Dev / offline mode — skip auth entirely
       if (screen === 'loading') setScreen('home');
       return;
     }
@@ -104,16 +104,16 @@ export default function App() {
     setScreen('home');
   }, []);
 
-  const handleSelect = useCallback((id: string) => {
+  const handleSelectGrapheme = useCallback((id: string) => {
     setSelectedId(id);
     setScreen('practise');
   }, []);
 
-  const handleBack = useCallback(() => {
-    setScreen('home');
+  const handleBackToAlphabetHub = useCallback(() => {
+    setScreen('alphabet-hub');
   }, []);
 
-  const handleNext = useCallback(() => {
+  const handleNextGrapheme = useCallback(() => {
     const currentIdx = GRAPHEMES.findIndex((g) => g.id === selectedId);
     const nextIdx = (currentIdx + 1) % GRAPHEMES.length;
     setSelectedId(GRAPHEMES[nextIdx].id);
@@ -121,13 +121,18 @@ export default function App() {
   }, [selectedId]);
 
   // ── Assessment Flow Handlers ──────────────────────────────────────────
-  const handleLaunchAssessment = useCallback(() => {
+  const handleStartAdventure = useCallback(() => {
     if (!hasConsented) {
       setScreen('consent');
     } else {
       setScreen('assessment-intro');
     }
   }, [hasConsented]);
+
+  const handleTryDemo = useCallback(async () => {
+    await startAssessment(activeChild);
+    setScreen('assessment-practice');
+  }, [startAssessment, activeChild]);
 
   const handleConsentGranted = useCallback(() => {
     setHasConsented(true);
@@ -143,12 +148,29 @@ export default function App() {
     setScreen('assessment');
   }, []);
 
-  const handleExitAssessment = useCallback(() => {
+  const handleFinishAssessmentCheckpoint = useCallback(async () => {
+    const scoredResults = scoreAssessmentSession(itemResponses, activeChild.age_band);
+    setAssessmentResults(scoredResults);
+    await finishAssessment(activeChild, scoredResults.overallProfileSummary);
+    setScreen('assessment-results');
+  }, [itemResponses, activeChild, finishAssessment]);
+
+  const handleStartPersonalizedLearning = useCallback((graphemes: string[]) => {
+    const focusLetter = graphemes[0]?.toUpperCase() || 'A';
+    setSelectedId(focusLetter);
+    setScreen('practise');
+  }, []);
+
+  const handleOpenAlphabetHub = useCallback(() => {
+    setScreen('alphabet-hub');
+  }, []);
+
+  const handleExitToHome = useCallback(() => {
     resetAssessment();
     setScreen('home');
   }, [resetAssessment]);
 
-  const grapheme = getGrapheme(selectedId)!;
+  const grapheme = getGrapheme(selectedId) || getGrapheme('A')!;
 
   // ── Render ────────────────────────────────────────────────────────────
   if (screen === 'loading') {
@@ -161,7 +183,7 @@ export default function App() {
 
   return (
     <main className="flex flex-col items-center min-h-dvh w-full" style={{ background: 'var(--color-cloud)' }}>
-      {/* Decorative top stripe */}
+      {/* Decorative top rainbow stripe */}
       <div
         className="w-full h-2 flex-shrink-0"
         style={{ background: 'linear-gradient(90deg, var(--color-sky), var(--color-lavender), var(--color-sun), var(--color-grass))' }}
@@ -175,32 +197,26 @@ export default function App() {
         <ChildSelector onChildSelected={handleChildSelected} />
       )}
 
+      {/* ── 1. Front Colorful Landing Page (ReadQuest Hero) ── */}
       {screen === 'home' && (
-        <LetterSelector
+        <AdventureLandingHero
           child={activeChild}
-          onSelect={handleSelect}
-          onSwitchProfile={() => setScreen('pick-child')}
-          onLaunchAssessment={handleLaunchAssessment}
+          onStartAdventure={handleStartAdventure}
+          onTryDemo={handleTryDemo}
+          onOpenParentTeacher={() => setScreen('pick-child')}
         />
       )}
 
-      {screen === 'practise' && (
-        <PractiseScreen
-          key={selectedId}
-          grapheme={grapheme}
-          onBack={handleBack}
-          onNext={handleNext}
-        />
-      )}
-
+      {/* ── 2. Parental Consent & Disclaimer Screen ── */}
       {screen === 'consent' && (
         <AssessmentConsent
           child={activeChild}
           onConsentGranted={handleConsentGranted}
-          onBack={handleExitAssessment}
+          onBack={handleExitToHome}
         />
       )}
 
+      {/* ── 3. Adventure Briefing & Audio Check ── */}
       {screen === 'assessment-intro' && (
         <AssessmentIntro
           child={activeChild}
@@ -209,6 +225,7 @@ export default function App() {
         />
       )}
 
+      {/* ── 4. Interactive Warm-up Tutorial ── */}
       {screen === 'assessment-practice' && (
         <AssessmentPractice
           child={activeChild}
@@ -217,11 +234,55 @@ export default function App() {
         />
       )}
 
+      {/* ── 5. 10-Stage Island Psychometric Screening ── */}
       {screen === 'assessment' && (
         <AssessmentRunner
           child={activeChild}
-          onFinishAssessment={handleExitAssessment}
-          onExitToHome={handleExitAssessment}
+          onFinishAssessment={handleFinishAssessmentCheckpoint}
+          onExitToHome={handleExitToHome}
+        />
+      )}
+
+      {/* ── 6. Scores & Superpowers Trophy Room ── */}
+      {screen === 'assessment-results' && assessmentResults && (
+        <AssessmentResultsDashboard
+          child={activeChild}
+          results={assessmentResults}
+          onStartPersonalizedLearning={handleStartPersonalizedLearning}
+          onReturnHome={handleOpenAlphabetHub}
+        />
+      )}
+
+      {/* ── 7. Haptic Alphabet Learning Hub (Unlocked after Assessment) ── */}
+      {screen === 'alphabet-hub' && (
+        <div className="w-full">
+          <div className="max-w-md mx-auto pt-3 px-4 flex justify-between items-center">
+            <button
+              onClick={handleExitToHome}
+              className="text-xs font-bold text-slate-500 hover:text-slate-800 bg-white/80 px-3 py-1.5 rounded-xl border border-slate-200 cursor-pointer active:scale-95 transition"
+            >
+              ← Back to Adventure Hub
+            </button>
+            <span className="text-xs font-black text-purple-700 bg-purple-100 px-3 py-1 rounded-full">
+              Alphabet Tracing Studio ✍️
+            </span>
+          </div>
+          <LetterSelector
+            child={activeChild}
+            onSelect={handleSelectGrapheme}
+            onSwitchProfile={() => setScreen('pick-child')}
+            onLaunchAssessment={handleStartAdventure}
+          />
+        </div>
+      )}
+
+      {/* ── 8. Active Haptic Canvas Tracing Session ── */}
+      {screen === 'practise' && (
+        <PractiseScreen
+          key={selectedId}
+          grapheme={grapheme}
+          onBack={handleBackToAlphabetHub}
+          onNext={handleNextGrapheme}
         />
       )}
     </main>

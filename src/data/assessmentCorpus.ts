@@ -1,14 +1,9 @@
 /**
- * assessmentCorpus.ts — Research-Informed Stimulus Item Bank for Reading Screening
+ * assessmentCorpus.ts — Research-Informed Stimulus Item Bank for Reading & Cognitive Screening
  *
- * Contains standardized, age-appropriate, phonotactically legal items for:
- *   - Stage 01: Letter Knowledge (Grapheme ID, Upper/Lower Match, Letter-Sound GPC)
- *   - Stage 02: Phonological Awareness (Rhyme, Initial/Final Sound, Blending, Deletion)
- *   - Stage 03: Phonological Decoding (Phonotactically Legal Pseudowords in English)
- *   - Stage 04: Word Recognition (High-Frequency Regular & Irregular Sight Words)
- *
- * All items follow English phonotactic and orthographic constraints.
- * Practice items are explicitly flagged (`isPractice: true`) and never scored.
+ * All items follow English phonotactic, orthographic, and developmental constraints.
+ * Options have balanced correct answer placement across all choices.
+ * Context and prompts are designed to be engaging, child-friendly, and supportive.
  */
 
 export interface AssessmentCorpusItem {
@@ -43,16 +38,16 @@ export const STAGE_01_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'letter_identification',
     difficultyTier: 'easy',
     isPractice: true,
-    promptText: "Tap the letter 'A'!",
-    audioPromptText: "Tap the letter A!",
+    promptText: "🌳 Look in the tree branches! Tap the letter 'A'!",
+    audioPromptText: "Look in the tree branches! Tap the big letter A!",
     options: [
-      { id: 'opt_A', label: 'A', isCorrect: true },
       { id: 'opt_O', label: 'O', isCorrect: false },
+      { id: 'opt_A', label: 'A', isCorrect: true },
       { id: 'opt_T', label: 'T', isCorrect: false },
     ],
     expectedAnswerId: 'opt_A',
   },
-  // Easy Tier (High-frequency, distinct uppercase/lowercase)
+  // Easy Tier
   {
     id: 's01_e01',
     stageId: 'stage_01',
@@ -60,11 +55,11 @@ export const STAGE_01_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'letter_identification',
     difficultyTier: 'easy',
     isPractice: false,
-    promptText: "Find the letter that makes the /s/ sound, as in 'Sun'!",
-    audioPromptText: "Find the letter that makes the sss sound, as in Sun!",
+    promptText: "☀️ Hear the sizzling sun sound: /s/ as in 'Sun'! Which letter makes this sound?",
+    audioPromptText: "Hear the sizzling sun sound: sss, as in Sun! Which letter makes this sound?",
     options: [
-      { id: 'opt_S', label: 'S', isCorrect: true },
       { id: 'opt_M', label: 'M', isCorrect: false, errorType: 'PHONIC_DISTRACTOR' },
+      { id: 'opt_S', label: 'S', isCorrect: true },
       { id: 'opt_T', label: 'T', isCorrect: false, errorType: 'PHONIC_DISTRACTOR' },
       { id: 'opt_B', label: 'B', isCorrect: false, errorType: 'PHONIC_DISTRACTOR' },
     ],
@@ -77,17 +72,17 @@ export const STAGE_01_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'letter_sound_association',
     difficultyTier: 'easy',
     isPractice: false,
-    promptText: "Which letter makes the /m/ sound, as in 'Moon'?",
-    audioPromptText: "Which letter makes the mmm sound, as in Moon?",
+    promptText: "🌙 The glowing moon makes the humming /m/ sound! Which letter makes this sound?",
+    audioPromptText: "The glowing moon makes the humming mmm sound! Which letter is it?",
     options: [
-      { id: 'opt_M', label: 'M', isCorrect: true },
       { id: 'opt_W', label: 'W', isCorrect: false, errorType: 'VISUAL_INVERSION_OBSERVATION' },
       { id: 'opt_N', label: 'N', isCorrect: false, errorType: 'ORTHOGRAPHIC_SIMILAR' },
+      { id: 'opt_M', label: 'M', isCorrect: true },
       { id: 'opt_H', label: 'H', isCorrect: false, errorType: 'UNRELATED' },
     ],
     expectedAnswerId: 'opt_M',
   },
-  // Medium Tier (Upper/Lowercase matching with dissimilar forms)
+  // Medium Tier
   {
     id: 's01_m01',
     stageId: 'stage_01',
@@ -95,12 +90,12 @@ export const STAGE_01_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'case_matching',
     difficultyTier: 'medium',
     isPractice: false,
-    promptText: "Find the small lowercase match for uppercase 'G'!",
-    audioPromptText: "Find the small letter match for big letter G!",
+    promptText: "🔍 Match the big uppercase 'G' to its little lowercase twin!",
+    audioPromptText: "Match the big letter G to its little lowercase twin!",
     displayStimulus: 'G',
     options: [
-      { id: 'opt_g', label: 'g', isCorrect: true },
       { id: 'opt_q', label: 'q', isCorrect: false, errorType: 'VISUAL_SIMILAR_REVERSAL' },
+      { id: 'opt_g', label: 'g', isCorrect: true },
       { id: 'opt_j', label: 'j', isCorrect: false, errorType: 'ORTHOGRAPHIC_SIMILAR' },
       { id: 'opt_p', label: 'p', isCorrect: false, errorType: 'VISUAL_SIMILAR_REVERSAL' },
     ],
@@ -114,18 +109,18 @@ export const STAGE_01_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'case_matching',
     difficultyTier: 'medium',
     isPractice: false,
-    promptText: "Find the small lowercase match for uppercase 'R'!",
-    audioPromptText: "Find the small letter match for big letter R!",
+    promptText: "🔍 Match the big uppercase 'R' to its little lowercase twin!",
+    audioPromptText: "Match the big letter R to its little lowercase twin!",
     displayStimulus: 'R',
     options: [
-      { id: 'opt_r', label: 'r', isCorrect: true },
       { id: 'opt_n', label: 'n', isCorrect: false, errorType: 'ORTHOGRAPHIC_SIMILAR' },
       { id: 'opt_h', label: 'h', isCorrect: false, errorType: 'ORTHOGRAPHIC_SIMILAR' },
+      { id: 'opt_r', label: 'r', isCorrect: true },
       { id: 'opt_v', label: 'v', isCorrect: false, errorType: 'UNRELATED' },
     ],
     expectedAnswerId: 'opt_r',
   },
-  // Hard Tier (Phonemic soft sounds / visually confusable pairs b/d/p/q)
+  // Hard Tier
   {
     id: 's01_h01',
     stageId: 'stage_01',
@@ -133,11 +128,11 @@ export const STAGE_01_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'letter_identification',
     difficultyTier: 'hard',
     isPractice: false,
-    promptText: "Find the small letter 'b' as in 'ball'!",
-    audioPromptText: "Find the small letter b as in ball!",
+    promptText: "⚽️ Spot the lowercase 'b' for bouncy ball (not d, p, or q)!",
+    audioPromptText: "Spot the lowercase letter b as in bouncy ball!",
     options: [
-      { id: 'opt_b', label: 'b', isCorrect: true },
       { id: 'opt_d', label: 'd', isCorrect: false, errorType: 'ORTHOGRAPHIC_REVERSAL_OBSERVATION' },
+      { id: 'opt_b', label: 'b', isCorrect: true },
       { id: 'opt_p', label: 'p', isCorrect: false, errorType: 'ORTHOGRAPHIC_REVERSAL_OBSERVATION' },
       { id: 'opt_q', label: 'q', isCorrect: false, errorType: 'ORTHOGRAPHIC_REVERSAL_OBSERVATION' },
     ],
@@ -151,12 +146,12 @@ export const STAGE_01_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'letter_sound_association',
     difficultyTier: 'hard',
     isPractice: false,
-    promptText: "Which letter can make the soft /s/ sound as in 'City' or /k/ as in 'Cat'?",
-    audioPromptText: "Which letter can make the soft sss sound in City and k sound in Cat?",
+    promptText: "🐱 Special letter! Which letter makes the soft sound in 'City' and hard /k/ in 'Cat'?",
+    audioPromptText: "Which letter can make the soft sound in City and the k sound in Cat?",
     options: [
-      { id: 'opt_C', label: 'C', isCorrect: true },
       { id: 'opt_K', label: 'K', isCorrect: false, errorType: 'PHONIC_DISTRACTOR' },
       { id: 'opt_S', label: 'S', isCorrect: false, errorType: 'PHONIC_DISTRACTOR' },
+      { id: 'opt_C', label: 'C', isCorrect: true },
       { id: 'opt_G', label: 'G', isCorrect: false, errorType: 'ORTHOGRAPHIC_SIMILAR' },
     ],
     expectedAnswerId: 'opt_C',
@@ -173,15 +168,15 @@ export const STAGE_02_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'rhyme_detection',
     difficultyTier: 'easy',
     isPractice: true,
-    promptText: "Which word rhymes with 'CAT'?",
+    promptText: "🦇 Sound River rhyme! Which word rhymes with 'CAT'?",
     audioPromptText: "Which word rhymes with cat? Bat or Dog?",
     options: [
-      { id: 'opt_bat', label: 'BAT', icon: '🦇', isCorrect: true },
       { id: 'opt_dog', label: 'DOG', icon: '🐶', isCorrect: false },
+      { id: 'opt_bat', label: 'BAT', icon: '🦇', isCorrect: true },
     ],
     expectedAnswerId: 'opt_bat',
   },
-  // Easy Tier (Rhyme identification & Initial sound isolation)
+  // Easy Tier
   {
     id: 's02_e01',
     stageId: 'stage_02',
@@ -189,11 +184,11 @@ export const STAGE_02_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'rhyme_detection',
     difficultyTier: 'easy',
     isPractice: false,
-    promptText: "Which word rhymes with 'STAR'?",
+    promptText: "⭐️ Shining in the sky: Which word rhymes with 'STAR'?",
     audioPromptText: "Which word rhymes with star? Car, Sun, or Moon?",
     options: [
-      { id: 'opt_car', label: 'CAR', icon: '🚗', isCorrect: true },
       { id: 'opt_sun', label: 'SUN', icon: '☀️', isCorrect: false, errorType: 'SEMANTIC_DISTRACTOR' },
+      { id: 'opt_car', label: 'CAR', icon: '🚗', isCorrect: true },
       { id: 'opt_moon', label: 'MOON', icon: '🌙', isCorrect: false, errorType: 'SEMANTIC_DISTRACTOR' },
     ],
     expectedAnswerId: 'opt_car',
@@ -205,16 +200,16 @@ export const STAGE_02_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'initial_sound_isolation',
     difficultyTier: 'easy',
     isPractice: false,
-    promptText: "What is the FIRST sound you hear in 'FISH'?",
-    audioPromptText: "What is the first sound you hear in fish? /f/, /sh/, or /p/?",
+    promptText: "🐟 First sound quest! What is the FIRST sound you hear in 'FISH'?",
+    audioPromptText: "What is the very first sound you hear in the word fish? /f/, /sh/, or /p/?",
     options: [
-      { id: 'opt_f', label: '/f/', subLabel: 'sound /f/', isCorrect: true },
       { id: 'opt_sh', label: '/sh/', subLabel: 'sound /sh/', isCorrect: false, errorType: 'FINAL_SOUND_CONFUSION' },
+      { id: 'opt_f', label: '/f/', subLabel: 'sound /f/', isCorrect: true },
       { id: 'opt_p', label: '/p/', subLabel: 'sound /p/', isCorrect: false, errorType: 'LABIAL_DISTRACTOR' },
     ],
     expectedAnswerId: 'opt_f',
   },
-  // Medium Tier (Phoneme blending 3 sounds CVC)
+  // Medium Tier
   {
     id: 's02_m01',
     stageId: 'stage_02',
@@ -222,12 +217,12 @@ export const STAGE_02_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'phoneme_blending',
     difficultyTier: 'medium',
     isPractice: false,
-    promptText: "Blend the sounds: /d/ - /o/ - /g/! What word is it?",
+    promptText: "🐶 Blend the river sounds: /d/ - /o/ - /g/! What word does it make?",
     audioPromptText: "Blend these sounds together: /d/ ... /o/ ... /g/. What word does it make?",
     options: [
-      { id: 'opt_dog', label: 'DOG', icon: '🐶', isCorrect: true },
       { id: 'opt_dig', label: 'DIG', icon: '⛏️', isCorrect: false, errorType: 'VOWEL_CONFUSION' },
       { id: 'opt_dot', label: 'DOT', icon: '🔴', isCorrect: false, errorType: 'FINAL_CONSONANT_CONFUSION' },
+      { id: 'opt_dog', label: 'DOG', icon: '🐶', isCorrect: true },
     ],
     expectedAnswerId: 'opt_dog',
   },
@@ -238,16 +233,16 @@ export const STAGE_02_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'final_sound_isolation',
     difficultyTier: 'medium',
     isPractice: false,
-    promptText: "What is the LAST sound you hear in 'CUP'?",
-    audioPromptText: "What is the ending sound in cup? /p/, /k/, or /t/?",
+    promptText: "☕️ Ending sound quest! What is the LAST sound you hear in 'CUP'?",
+    audioPromptText: "What is the ending sound in the word cup? /p/, /k/, or /t/?",
     options: [
-      { id: 'opt_p', label: '/p/', subLabel: 'sound /p/', isCorrect: true },
       { id: 'opt_k', label: '/k/', subLabel: 'sound /k/', isCorrect: false, errorType: 'INITIAL_SOUND_CONFUSION' },
+      { id: 'opt_p', label: '/p/', subLabel: 'sound /p/', isCorrect: true },
       { id: 'opt_t', label: '/t/', subLabel: 'sound /t/', isCorrect: false, errorType: 'ALVEOLAR_DISTRACTOR' },
     ],
     expectedAnswerId: 'opt_p',
   },
-  // Hard Tier (Phoneme deletion / 4-sound blending)
+  // Hard Tier
   {
     id: 's02_h01',
     stageId: 'stage_02',
@@ -255,11 +250,11 @@ export const STAGE_02_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'phoneme_deletion',
     difficultyTier: 'hard',
     isPractice: false,
-    promptText: "Say 'PARK' without the /p/ sound. What is left?",
-    audioPromptText: "Say park without the /p/ sound. What word is left?",
+    promptText: "⛵️ Sound magic! Say 'PARK' without the /p/ sound. What is left?",
+    audioPromptText: "Say park without the /p/ sound at the start. What word is left?",
     options: [
-      { id: 'opt_ark', label: 'ARK', icon: '⛵', isCorrect: true },
       { id: 'opt_bark', label: 'BARK', icon: '🐕', isCorrect: false, errorType: 'SUBSTITUTION_ERROR' },
+      { id: 'opt_ark', label: 'ARK', icon: '⛵', isCorrect: true },
       { id: 'opt_pack', label: 'PACK', icon: '🎒', isCorrect: false, errorType: 'RHYME_ERROR' },
     ],
     expectedAnswerId: 'opt_ark',
@@ -271,19 +266,18 @@ export const STAGE_02_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'phoneme_blending_complex',
     difficultyTier: 'hard',
     isPractice: false,
-    promptText: "Blend these 4 sounds: /s/ - /p/ - /oo/ - /n/!",
-    audioPromptText: "Blend these 4 sounds: /s/ ... /p/ ... /oo/ ... /n/. What word is it?",
+    promptText: "🥄 4-Sound Blend: /s/ - /p/ - /oo/ - /n/! What word is it?",
+    audioPromptText: "Blend these 4 sounds together: /s/ ... /p/ ... /oo/ ... /n/. What word is it?",
     options: [
-      { id: 'opt_spoon', label: 'SPOON', icon: '🥄', isCorrect: true },
       { id: 'opt_spin', label: 'SPIN', icon: '🌀', isCorrect: false, errorType: 'VOWEL_CONFUSION' },
       { id: 'opt_soon', label: 'SOON', icon: '⏳', isCorrect: false, errorType: 'CLUSTER_REDUCTION_ERROR' },
+      { id: 'opt_spoon', label: 'SPOON', icon: '🥄', isCorrect: true },
     ],
     expectedAnswerId: 'opt_spoon',
   },
 ];
 
 // ── STAGE 03: PHONOLOGICAL DECODING (PSEUDOWORD) CORPUS ──────────────────────
-// All pseudowords follow strictly legal English phonotactic syllable structures.
 export const STAGE_03_ITEMS: AssessmentCorpusItem[] = [
   // Practice Item
   {
@@ -293,17 +287,17 @@ export const STAGE_03_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'pseudoword_decoding',
     difficultyTier: 'easy',
     isPractice: true,
-    promptText: "Read the alien word 'TUP'! Which audio matches it?",
+    promptText: "👾 Read the alien word 'TUP'! Which audio sound matches it?",
     audioPromptText: "Read this alien word: T U P. Which audio matches it?",
     displayStimulus: 'TUP',
     options: [
-      { id: 'opt_tup', label: 'TUP (/tʌp/)', isCorrect: true },
       { id: 'opt_top', label: 'TOP (/tɒp/)', isCorrect: false, errorType: 'VOWEL_SUBSTITUTION' },
+      { id: 'opt_tup', label: 'TUP (/tʌp/)', isCorrect: true },
       { id: 'opt_pup', label: 'PUP (/pʌp/)', isCorrect: false, errorType: 'INITIAL_CONSONANT_ERROR' },
     ],
     expectedAnswerId: 'opt_tup',
   },
-  // Easy Tier (Regular CVC Pseudowords)
+  // Easy Tier
   {
     id: 's03_e01',
     stageId: 'stage_03',
@@ -311,13 +305,13 @@ export const STAGE_03_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'pseudoword_decoding',
     difficultyTier: 'easy',
     isPractice: false,
-    promptText: "Read the alien word 'MIP'! Which sound does it make?",
+    promptText: "👾 Alien Cave message! Read the nonword 'MIP'!",
     audioPromptText: "Read this alien word: M I P. Which sound does it make?",
     displayStimulus: 'MIP',
     options: [
-      { id: 'opt_mip', label: 'MIP (/mɪp/)', isCorrect: true },
       { id: 'opt_mop', label: 'MOP (/mɒp/)', isCorrect: false, errorType: 'VOWEL_SUBSTITUTION' },
       { id: 'opt_nip', label: 'NIP (/nɪp/)', isCorrect: false, errorType: 'NASAL_CONFUSION' },
+      { id: 'opt_mip', label: 'MIP (/mɪp/)', isCorrect: true },
       { id: 'opt_map', label: 'MAP (/mæp/)', isCorrect: false, errorType: 'VOWEL_SUBSTITUTION' },
     ],
     expectedAnswerId: 'opt_mip',
@@ -329,19 +323,19 @@ export const STAGE_03_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'pseudoword_decoding',
     difficultyTier: 'easy',
     isPractice: false,
-    promptText: "Read the alien word 'DAX'! Which sound does it make?",
+    promptText: "👾 Alien Cave message! Read the nonword 'DAX'!",
     audioPromptText: "Read this alien word: D A X. Which sound does it make?",
     displayStimulus: 'DAX',
     options: [
-      { id: 'opt_dax', label: 'DAX (/dæks/)', isCorrect: true },
       { id: 'opt_bax', label: 'BAX (/bæks/)', isCorrect: false, errorType: 'REVERSAL_CONFUSION_OBSERVATION' },
+      { id: 'opt_dax', label: 'DAX (/dæks/)', isCorrect: true },
       { id: 'opt_dox', label: 'DOX (/dɒks/)', isCorrect: false, errorType: 'VOWEL_SUBSTITUTION' },
       { id: 'opt_tax', label: 'TAX (/tæks/)', isCorrect: false, errorType: 'VOICING_CONFUSION' },
     ],
     expectedAnswerId: 'opt_dax',
     reversalDistractorPresent: true,
   },
-  // Medium Tier (CCVC / CVCC Blends Pseudowords)
+  // Medium Tier
   {
     id: 's03_m01',
     stageId: 'stage_03',
@@ -349,13 +343,13 @@ export const STAGE_03_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'pseudoword_decoding',
     difficultyTier: 'medium',
     isPractice: false,
-    promptText: "Read the alien word 'FLIM'! Which sound does it make?",
+    promptText: "👾 Read the 4-letter blend alien word 'FLIM'!",
     audioPromptText: "Read this alien word: F L I M. Which sound does it make?",
     displayStimulus: 'FLIM',
     options: [
-      { id: 'opt_flim', label: 'FLIM (/flɪm/)', isCorrect: true },
       { id: 'opt_slim', label: 'SLIM (/slɪm/)', isCorrect: false, errorType: 'CLUSTER_SUBSTITUTION' },
       { id: 'opt_flam', label: 'FLAM (/flæm/)', isCorrect: false, errorType: 'VOWEL_SUBSTITUTION' },
+      { id: 'opt_flim', label: 'FLIM (/flɪm/)', isCorrect: true },
       { id: 'opt_film', label: 'FILM (/fɪlm/)', isCorrect: false, errorType: 'ANAGRAM_TRANSPOSITION' },
     ],
     expectedAnswerId: 'opt_flim',
@@ -367,19 +361,19 @@ export const STAGE_03_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'pseudoword_decoding',
     difficultyTier: 'medium',
     isPractice: false,
-    promptText: "Read the alien word 'BRUST'!",
+    promptText: "👾 Read the blend alien word 'BRUST'!",
     audioPromptText: "Read this alien word: B R U S T. Which sound does it make?",
     displayStimulus: 'BRUST',
     options: [
-      { id: 'opt_brust', label: 'BRUST (/brʌst/)', isCorrect: true },
       { id: 'opt_drust', label: 'DRUST (/drʌst/)', isCorrect: false, errorType: 'REVERSAL_CONFUSION_OBSERVATION' },
+      { id: 'opt_brust', label: 'BRUST (/brʌst/)', isCorrect: true },
       { id: 'opt_brast', label: 'BRAST (/bræst/)', isCorrect: false, errorType: 'VOWEL_SUBSTITUTION' },
       { id: 'opt_burst', label: 'BURST (/bɜːrst/)', isCorrect: false, errorType: 'REAL_WORD_INTRUSION' },
     ],
     expectedAnswerId: 'opt_brust',
     reversalDistractorPresent: true,
   },
-  // Hard Tier (Consonant Digraphs & Vowel Teams Pseudowords)
+  // Hard Tier
   {
     id: 's03_h01',
     stageId: 'stage_03',
@@ -387,14 +381,14 @@ export const STAGE_03_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'pseudoword_decoding',
     difficultyTier: 'hard',
     isPractice: false,
-    promptText: "Read the alien word 'THAMP'!",
+    promptText: "👾 Digraph Challenge! Read the alien word 'THAMP'!",
     audioPromptText: "Read this alien word: T H A M P. Which sound does it make?",
     displayStimulus: 'THAMP',
     options: [
-      { id: 'opt_thamp', label: 'THAMP (/θæmp/)', isCorrect: true },
       { id: 'opt_tamp', label: 'TAMP (/tæmp/)', isCorrect: false, errorType: 'DIGRAPH_REDUCTION' },
       { id: 'opt_champ', label: 'CHAMP (/tʃæmp/)', isCorrect: false, errorType: 'DIGRAPH_SUBSTITUTION' },
       { id: 'opt_thomp', label: 'THOMP (/θɒmp/)', isCorrect: false, errorType: 'VOWEL_SUBSTITUTION' },
+      { id: 'opt_thamp', label: 'THAMP (/θæmp/)', isCorrect: true },
     ],
     expectedAnswerId: 'opt_thamp',
   },
@@ -405,12 +399,12 @@ export const STAGE_03_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'pseudoword_decoding',
     difficultyTier: 'hard',
     isPractice: false,
-    promptText: "Read the alien word 'ZOUT'! It has a vowel team — what sound does it make?",
+    promptText: "👾 Vowel Team Challenge! Read the alien word 'ZOUT'!",
     audioPromptText: "Read this alien word with the ou team: Z O U T. Which sound does it make?",
     displayStimulus: 'ZOUT',
     options: [
-      { id: 'opt_zout', label: 'ZOUT (/zaʊt/)', isCorrect: true },
       { id: 'opt_zoot', label: 'ZOOT (/zuːt/)', isCorrect: false, errorType: 'DIPHTHONG_CONFUSION' },
+      { id: 'opt_zout', label: 'ZOUT (/zaʊt/)', isCorrect: true },
       { id: 'opt_sout', label: 'SOUT (/saʊt/)', isCorrect: false, errorType: 'VOICING_CONFUSION' },
       { id: 'opt_zot', label: 'ZOT (/zɒt/)', isCorrect: false, errorType: 'VOWEL_DIGRAPH_NEGLECT' },
     ],
@@ -419,7 +413,6 @@ export const STAGE_03_ITEMS: AssessmentCorpusItem[] = [
 ];
 
 // ── STAGE 04: REAL-WORD RECOGNITION CORPUS ────────────────────────────────────
-// Measures sight-word identification, lexical access, and orthographic accuracy.
 export const STAGE_04_ITEMS: AssessmentCorpusItem[] = [
   // Practice Item
   {
@@ -429,16 +422,16 @@ export const STAGE_04_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'sight_word_recognition',
     difficultyTier: 'easy',
     isPractice: true,
-    promptText: "Find the word 'CAT'!",
-    audioPromptText: "Find the word: Cat!",
+    promptText: "🦁 Safari Animal! Find the correctly spelled word: 'CAT'!",
+    audioPromptText: "Find the correctly spelled word: Cat!",
     options: [
-      { id: 'opt_cat', label: 'CAT', icon: '🐱', isCorrect: true },
       { id: 'opt_bat', label: 'BAT', icon: '🦇', isCorrect: false },
+      { id: 'opt_cat', label: 'CAT', icon: '🐱', isCorrect: true },
       { id: 'opt_hat', label: 'HAT', icon: '🎩', isCorrect: false },
     ],
     expectedAnswerId: 'opt_cat',
   },
-  // Easy Tier (Pre-primer / Primer high-frequency sight words)
+  // Easy Tier
   {
     id: 's04_e01',
     stageId: 'stage_04',
@@ -446,11 +439,11 @@ export const STAGE_04_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'sight_word_recognition',
     difficultyTier: 'easy',
     isPractice: false,
-    promptText: "Find the word: 'THE'!",
-    audioPromptText: "Find the word: The! As in, the happy sun.",
+    promptText: "🦁 Sight word quest! Find the word: 'THE'!",
+    audioPromptText: "Find the word: The! As in, the happy explorer.",
     options: [
-      { id: 'opt_the', label: 'THE', isCorrect: true },
       { id: 'opt_teh', label: 'TEH', isCorrect: false, errorType: 'TRANSPOSITION_ERROR' },
+      { id: 'opt_the', label: 'THE', isCorrect: true },
       { id: 'opt_they', label: 'THEY', isCorrect: false, errorType: 'VISUAL_EXTENSION' },
       { id: 'opt_that', label: 'THAT', isCorrect: false, errorType: 'ORTHOGRAPHIC_NEIGHBOR' },
     ],
@@ -463,17 +456,17 @@ export const STAGE_04_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'sight_word_recognition',
     difficultyTier: 'easy',
     isPractice: false,
-    promptText: "Find the word: 'LOOK'!",
+    promptText: "🦁 Sight word quest! Find the word: 'LOOK'!",
     audioPromptText: "Find the word: Look! As in, look at the stars.",
     options: [
-      { id: 'opt_look', label: 'LOOK', isCorrect: true },
       { id: 'opt_book', label: 'BOOK', isCorrect: false, errorType: 'ORTHOGRAPHIC_NEIGHBOR' },
       { id: 'opt_took', label: 'TOOK', isCorrect: false, errorType: 'ORTHOGRAPHIC_NEIGHBOR' },
+      { id: 'opt_look', label: 'LOOK', isCorrect: true },
       { id: 'opt_lock', label: 'LOCK', isCorrect: false, errorType: 'VOWEL_CONFUSION' },
     ],
     expectedAnswerId: 'opt_look',
   },
-  // Medium Tier (Grade 1-2 irregular high-frequency words)
+  // Medium Tier
   {
     id: 's04_m01',
     stageId: 'stage_04',
@@ -481,12 +474,12 @@ export const STAGE_04_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'sight_word_recognition',
     difficultyTier: 'medium',
     isPractice: false,
-    promptText: "Find the word: 'SAID'!",
+    promptText: "🦁 Word Safari: Find the word 'SAID' (as in, Lyra said hello)!",
     audioPromptText: "Find the word: Said! As in, Lyra said hello.",
     options: [
-      { id: 'opt_said', label: 'SAID', isCorrect: true },
       { id: 'opt_sed', label: 'SED', isCorrect: false, errorType: 'PHONETIC_MISPELLING' },
       { id: 'opt_paid', label: 'PAID', isCorrect: false, errorType: 'ORTHOGRAPHIC_NEIGHBOR' },
+      { id: 'opt_said', label: 'SAID', isCorrect: true },
       { id: 'opt_sand', label: 'SAND', isCorrect: false, errorType: 'LETTER_INSERTION' },
     ],
     expectedAnswerId: 'opt_said',
@@ -498,8 +491,8 @@ export const STAGE_04_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'sight_word_recognition',
     difficultyTier: 'medium',
     isPractice: false,
-    promptText: "Find the word: 'WATER'!",
-    audioPromptText: "Find the word: Water! As in, a glass of water.",
+    promptText: "🦁 Word Safari: Find the word 'WATER'!",
+    audioPromptText: "Find the word: Water! As in, a cool glass of water.",
     options: [
       { id: 'opt_water', label: 'WATER', isCorrect: true },
       { id: 'opt_waiter', label: 'WAITER', isCorrect: false, errorType: 'ORTHOGRAPHIC_CONFUSION' },
@@ -508,7 +501,7 @@ export const STAGE_04_ITEMS: AssessmentCorpusItem[] = [
     ],
     expectedAnswerId: 'opt_water',
   },
-  // Hard Tier (Grade 3-4 orthographically complex irregular words)
+  // Hard Tier
   {
     id: 's04_h01',
     stageId: 'stage_04',
@@ -516,12 +509,12 @@ export const STAGE_04_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'sight_word_recognition',
     difficultyTier: 'hard',
     isPractice: false,
-    promptText: "Find the word: 'BECAUSE'!",
+    promptText: "🦁 Complex Word: Find the correct spelling for 'BECAUSE'!",
     audioPromptText: "Find the word: Because! As in, I smiled because I was happy.",
     options: [
-      { id: 'opt_because', label: 'BECAUSE', isCorrect: true },
       { id: 'opt_becos', label: 'BECOS', isCorrect: false, errorType: 'PHONETIC_MISPELLING' },
       { id: 'opt_becuase', label: 'BECUASE', isCorrect: false, errorType: 'TRANSPOSITION_ERROR' },
+      { id: 'opt_because', label: 'BECAUSE', isCorrect: true },
       { id: 'opt_become', label: 'BECOME', isCorrect: false, errorType: 'MORPHOLOGICAL_CONFUSION' },
     ],
     expectedAnswerId: 'opt_because',
@@ -533,14 +526,778 @@ export const STAGE_04_ITEMS: AssessmentCorpusItem[] = [
     taskType: 'sight_word_recognition',
     difficultyTier: 'hard',
     isPractice: false,
-    promptText: "Find the word: 'KNIGHT'!",
+    promptText: "🦁 Silent-K Word: Find the brave 'KNIGHT' in shining armor!",
     audioPromptText: "Find the word: Knight! As in, the brave knight in shining armor.",
     options: [
-      { id: 'opt_knight', label: 'KNIGHT', isCorrect: true },
       { id: 'opt_night', label: 'NIGHT', isCorrect: false, errorType: 'HOMOPHONE_ERROR' },
+      { id: 'opt_knight', label: 'KNIGHT', isCorrect: true },
       { id: 'opt_nite', label: 'NITE', isCorrect: false, errorType: 'PHONETIC_COLLOQUIAL' },
       { id: 'opt_king', label: 'KING', isCorrect: false, errorType: 'SEMANTIC_DISTRACTOR' },
     ],
     expectedAnswerId: 'opt_knight',
+  },
+];
+
+// ── STAGE 05: READING FLUENCY (SENTENCE VERIFICATION) CORPUS ──────────────────
+export const STAGE_05_ITEMS: AssessmentCorpusItem[] = [
+  // Practice Item
+  {
+    id: 's05_p01',
+    stageId: 'stage_05',
+    domain: 'reading_fluency',
+    taskType: 'sentence_verification',
+    difficultyTier: 'easy',
+    isPractice: true,
+    promptText: "🏄 Surf the Fluency Rapids! Read: 'Dogs have four legs.' Is this True or False?",
+    audioPromptText: "Read the sentence: Dogs have four legs. Is this True or False?",
+    displayStimulus: "Dogs have four legs.",
+    options: [
+      { id: 'opt_false', label: 'FALSE ❌', isCorrect: false },
+      { id: 'opt_true', label: 'TRUE ✅', isCorrect: true },
+    ],
+    expectedAnswerId: 'opt_true',
+  },
+  // Easy Tier
+  {
+    id: 's05_e01',
+    stageId: 'stage_05',
+    domain: 'reading_fluency',
+    taskType: 'sentence_verification',
+    difficultyTier: 'easy',
+    isPractice: false,
+    promptText: "🏄 Rapid Sentence: 'Fish swim in the blue water.'",
+    audioPromptText: "Read the sentence: Fish swim in the blue water. Is it True or False?",
+    displayStimulus: "Fish swim in the blue water.",
+    options: [
+      { id: 'opt_false', label: 'FALSE ❌', isCorrect: false, errorType: 'SEMANTIC_VERIFICATION_ERROR' },
+      { id: 'opt_true', label: 'TRUE ✅', isCorrect: true },
+    ],
+    expectedAnswerId: 'opt_true',
+  },
+  {
+    id: 's05_e02',
+    stageId: 'stage_05',
+    domain: 'reading_fluency',
+    taskType: 'sentence_verification',
+    difficultyTier: 'easy',
+    isPractice: false,
+    promptText: "🏄 Rapid Sentence: 'Tall green trees can walk and run.'",
+    audioPromptText: "Read the sentence: Tall green trees can walk and run. Is it True or False?",
+    displayStimulus: "Tall green trees can walk and run.",
+    options: [
+      { id: 'opt_true', label: 'TRUE ✅', isCorrect: false, errorType: 'SEMANTIC_VERIFICATION_ERROR' },
+      { id: 'opt_false', label: 'FALSE ❌', isCorrect: true },
+    ],
+    expectedAnswerId: 'opt_false',
+  },
+  // Medium Tier
+  {
+    id: 's05_m01',
+    stageId: 'stage_05',
+    domain: 'reading_fluency',
+    taskType: 'sentence_verification',
+    difficultyTier: 'medium',
+    isPractice: false,
+    promptText: "🏄 Rapid Sentence: 'Sweet red apples grow on orchard branches.'",
+    audioPromptText: "Read the sentence: Sweet red apples grow on orchard branches. Is it True or False?",
+    displayStimulus: "Sweet red apples grow on orchard branches.",
+    options: [
+      { id: 'opt_true', label: 'TRUE ✅', isCorrect: true },
+      { id: 'opt_false', label: 'FALSE ❌', isCorrect: false, errorType: 'SEMANTIC_VERIFICATION_ERROR' },
+    ],
+    expectedAnswerId: 'opt_true',
+  },
+  {
+    id: 's05_m02',
+    stageId: 'stage_05',
+    domain: 'reading_fluency',
+    taskType: 'sentence_verification',
+    difficultyTier: 'medium',
+    isPractice: false,
+    promptText: "🏄 Rapid Sentence: 'Frozen ice cream is boiling hot like soup.'",
+    audioPromptText: "Read the sentence: Frozen ice cream is boiling hot like soup. Is it True or False?",
+    displayStimulus: "Frozen ice cream is boiling hot like soup.",
+    options: [
+      { id: 'opt_true', label: 'TRUE ✅', isCorrect: false, errorType: 'SEMANTIC_VERIFICATION_ERROR' },
+      { id: 'opt_false', label: 'FALSE ❌', isCorrect: true },
+    ],
+    expectedAnswerId: 'opt_false',
+  },
+  // Hard Tier
+  {
+    id: 's05_h01',
+    stageId: 'stage_05',
+    domain: 'reading_fluency',
+    taskType: 'sentence_verification',
+    difficultyTier: 'hard',
+    isPractice: false,
+    promptText: "🏄 'When heavy rain falls from clouds, children open umbrellas to stay dry.'",
+    audioPromptText: "Read the sentence carefully. Is it True or False?",
+    displayStimulus: "When heavy rain falls from clouds, children open umbrellas to stay dry.",
+    options: [
+      { id: 'opt_false', label: 'FALSE ❌', isCorrect: false, errorType: 'SYNTACTIC_COMPREHENSION_ERROR' },
+      { id: 'opt_true', label: 'TRUE ✅', isCorrect: true },
+    ],
+    expectedAnswerId: 'opt_true',
+  },
+  {
+    id: 's05_h02',
+    stageId: 'stage_05',
+    domain: 'reading_fluency',
+    taskType: 'sentence_verification',
+    difficultyTier: 'hard',
+    isPractice: false,
+    promptText: "🏄 'Automobiles drive on ocean waves while wooden sailboats cruise on asphalt roads.'",
+    audioPromptText: "Read the sentence carefully. Is it True or False?",
+    displayStimulus: "Automobiles drive on ocean waves while wooden sailboats cruise on asphalt roads.",
+    options: [
+      { id: 'opt_true', label: 'TRUE ✅', isCorrect: false, errorType: 'SYNTACTIC_COMPREHENSION_ERROR' },
+      { id: 'opt_false', label: 'FALSE ❌', isCorrect: true },
+    ],
+    expectedAnswerId: 'opt_false',
+  },
+];
+
+// ── STAGE 06: READING COMPREHENSION CORPUS ─────────────────────────────────────
+export const STAGE_06_ITEMS: AssessmentCorpusItem[] = [
+  // Practice Item
+  {
+    id: 's06_p01',
+    stageId: 'stage_06',
+    domain: 'reading_comprehension',
+    taskType: 'narrative_recall',
+    difficultyTier: 'easy',
+    isPractice: true,
+    promptText: "🏰 Castle Tale: What color is Milo's ball in the story?",
+    audioPromptText: "Listen or read the story, then answer: What color is Milo's ball?",
+    displayStimulus: "Milo the puppy has a bright red ball. He rolls the ball across the green lawn.",
+    options: [
+      { id: 'opt_blue', label: 'Blue ball', isCorrect: false },
+      { id: 'opt_red', label: 'Bright red ball', isCorrect: true },
+      { id: 'opt_yellow', label: 'Yellow ball', isCorrect: false },
+    ],
+    expectedAnswerId: 'opt_red',
+  },
+  // Easy Tier
+  {
+    id: 's06_e01',
+    stageId: 'stage_06',
+    domain: 'reading_comprehension',
+    taskType: 'literal_recall',
+    difficultyTier: 'easy',
+    isPractice: false,
+    promptText: "🏰 Where did Pip the squirrel discover the crunchy acorns?",
+    audioPromptText: "Read or listen to the story: Where did Pip find the acorns?",
+    displayStimulus: "Pip the little squirrel climbed up the tall oak tree. Inside a leafy branch, he discovered three crunchy acorns.",
+    options: [
+      { id: 'opt_ground', label: 'On the muddy ground', isCorrect: false, errorType: 'PLAUSIBLE_LITERAL_DISTRACTOR' },
+      { id: 'opt_branch', label: 'Inside a leafy branch', isCorrect: true },
+      { id: 'opt_cave', label: 'In a dark stone cave', isCorrect: false, errorType: 'UNRELATED' },
+    ],
+    expectedAnswerId: 'opt_branch',
+  },
+  {
+    id: 's06_e02',
+    stageId: 'stage_06',
+    domain: 'reading_comprehension',
+    taskType: 'literal_recall',
+    difficultyTier: 'easy',
+    isPractice: false,
+    promptText: "🏰 Why was Pip smiling as he held the acorns with his paws?",
+    audioPromptText: "Why was Pip smiling as he held the acorns?",
+    displayStimulus: "Pip held the acorns tightly with both paws. He smiled happily because he had plenty of food saved for the chilly winter.",
+    options: [
+      { id: 'opt_bird', label: 'He saw a singing bird', isCorrect: false, errorType: 'EXTRANEOUS_DETAIL' },
+      { id: 'opt_nap', label: 'He wanted to take a quick nap', isCorrect: false, errorType: 'UNRELATED' },
+      { id: 'opt_food', label: 'He had food saved for winter', isCorrect: true },
+    ],
+    expectedAnswerId: 'opt_food',
+  },
+  // Medium Tier
+  {
+    id: 's06_m01',
+    stageId: 'stage_06',
+    domain: 'reading_comprehension',
+    taskType: 'inferential_comprehension',
+    difficultyTier: 'medium',
+    isPractice: false,
+    promptText: "🏰 How was Luna the baby owl able to fly safely across the dark forest?",
+    audioPromptText: "Read the story: How was Luna able to fly safely across the dark forest?",
+    displayStimulus: "Luna the baby owl spread her wings under the midnight sky. The glowing full moon and twinkling silver stars lit a clear pathway between the tall pine trees.",
+    options: [
+      { id: 'opt_sun', label: 'The morning sun was rising', isCorrect: false, errorType: 'INCONSISTENT_TIMING' },
+      { id: 'opt_moon', label: 'The bright moon and stars lit her path', isCorrect: true },
+      { id: 'opt_light', label: 'She carried a shiny lantern', isCorrect: false, errorType: 'IMAGINED_OBJECT' },
+    ],
+    expectedAnswerId: 'opt_moon',
+  },
+  {
+    id: 's06_m02',
+    stageId: 'stage_06',
+    domain: 'reading_comprehension',
+    taskType: 'vocabulary_in_context',
+    difficultyTier: 'medium',
+    isPractice: false,
+    promptText: "🏰 Luna let out a 'joyful' hoot. What does the word 'joyful' mean here?",
+    audioPromptText: "What does the word joyful mean in this story?",
+    displayStimulus: "Luna landed gently upon a smooth perch and let out a joyful hoot that echoed across the valley.",
+    options: [
+      { id: 'opt_sleepy', label: 'Tired and ready to sleep', isCorrect: false, errorType: 'SEMANTIC_CONFUSION' },
+      { id: 'opt_happy', label: 'Very happy and cheerful', isCorrect: true },
+      { id: 'opt_scared', label: 'Frightened and worried', isCorrect: false, errorType: 'OPPOSITE_VALENCE' },
+    ],
+    expectedAnswerId: 'opt_happy',
+  },
+  // Hard Tier
+  {
+    id: 's06_h01',
+    stageId: 'stage_06',
+    domain: 'reading_comprehension',
+    taskType: 'complex_inference',
+    difficultyTier: 'hard',
+    isPractice: false,
+    promptText: "🏰 What clue guided Oliver to the hidden clearing near the waterfall?",
+    audioPromptText: "What clue guided Oliver to the hidden clearing?",
+    displayStimulus: "Oliver noticed tiny damp paw prints heading toward the mist of the waterfall. He peered closely with his magnifying glass and followed the trail until he spotted a badger family sharing wild berries.",
+    options: [
+      { id: 'opt_thunder', label: 'Hearing distant thunder rumbling', isCorrect: false, errorType: 'AUDITORY_DISTRACTOR' },
+      { id: 'opt_prints', label: 'Following the tiny paw prints with his magnifying glass', isCorrect: true },
+      { id: 'opt_sign', label: 'Reading a wooden trail signpost', isCorrect: false, errorType: 'PLAUSIBLE_SCHEMATIC' },
+    ],
+    expectedAnswerId: 'opt_prints',
+  },
+  {
+    id: 's06_h02',
+    stageId: 'stage_06',
+    domain: 'reading_comprehension',
+    taskType: 'main_idea_synthesis',
+    difficultyTier: 'hard',
+    isPractice: false,
+    promptText: "🏰 Why did Oliver sketch a drawing in his adventure notebook?",
+    audioPromptText: "Why did Oliver sketch a drawing in his adventure notebook?",
+    displayStimulus: "Before heading home, Oliver sat on a mossy boulder and carefully sketched the badgers in his adventure notebook so that he would always remember this extraordinary discovery.",
+    options: [
+      { id: 'opt_lost', label: 'Because he accidentally dropped his camera', isCorrect: false, errorType: 'CONFABULATION' },
+      { id: 'opt_treasure', label: 'To create a treasure map for selling', isCorrect: false, errorType: 'MISATTRIBUTED_GOAL' },
+      { id: 'opt_remember', label: 'To preserve the memory of his special discovery', isCorrect: true },
+    ],
+    expectedAnswerId: 'opt_remember',
+  },
+];
+
+// ── STAGE 07: SPELLING & ORTHOGRAPHIC PRECISION CORPUS ────────────────────────
+export const STAGE_07_ITEMS: AssessmentCorpusItem[] = [
+  // Practice Item
+  {
+    id: 's07_p01',
+    stageId: 'stage_07',
+    domain: 'spelling',
+    taskType: 'orthographic_choice',
+    difficultyTier: 'easy',
+    isPractice: true,
+    promptText: "⚒️ Spell Forge: Which is the correct magic spelling for 'DOG'?",
+    audioPromptText: "Which is the correct spelling for: Dog?",
+    options: [
+      { id: 'opt_dogg', label: 'DOGG', isCorrect: false, errorType: 'CONSONANT_DOUBLING_ERROR' },
+      { id: 'opt_dog', label: 'DOG', isCorrect: true },
+      { id: 'opt_doj', label: 'DOJ', isCorrect: false, errorType: 'PHONETIC_SUBSTITUTION' },
+    ],
+    expectedAnswerId: 'opt_dog',
+  },
+  // Easy Tier
+  {
+    id: 's07_e01',
+    stageId: 'stage_07',
+    domain: 'spelling',
+    taskType: 'orthographic_choice',
+    difficultyTier: 'easy',
+    isPractice: false,
+    promptText: "⚒️ Crafting a green creature: Which is the correct spelling for 'FROG'?",
+    audioPromptText: "Find the correct spelling for: Frog! As in, the little green frog jumped.",
+    options: [
+      { id: 'opt_phrog', label: 'PHROG', isCorrect: false, errorType: 'PHONETIC_DIGRAPH_OVERGENERALIZATION' },
+      { id: 'opt_frog', label: 'FROG', isCorrect: true },
+      { id: 'opt_frogg', label: 'FROGG', isCorrect: false, errorType: 'CONSONANT_DOUBLING_ERROR' },
+      { id: 'opt_frug', label: 'FRUG', isCorrect: false, errorType: 'VOWEL_SUBSTITUTION' },
+    ],
+    expectedAnswerId: 'opt_frog',
+  },
+  {
+    id: 's07_e02',
+    stageId: 'stage_07',
+    domain: 'spelling',
+    taskType: 'orthographic_choice',
+    difficultyTier: 'easy',
+    isPractice: false,
+    promptText: "⚒️ Crafting a sailing boat: Which is the correct spelling for 'SHIP'?",
+    audioPromptText: "Find the correct spelling for: Ship! As in, a ship sailing on the sea.",
+    options: [
+      { id: 'opt_chip', label: 'CHIP', isCorrect: false, errorType: 'DIGRAPH_CONFUSION' },
+      { id: 'opt_shipp', label: 'SHIPP', isCorrect: false, errorType: 'CONSONANT_DOUBLING_ERROR' },
+      { id: 'opt_ship', label: 'SHIP', isCorrect: true },
+      { id: 'opt_shyp', label: 'SHYP', isCorrect: false, errorType: 'PHONETIC_Y_SUBSTITUTION' },
+    ],
+    expectedAnswerId: 'opt_ship',
+  },
+  // Medium Tier
+  {
+    id: 's07_m01',
+    stageId: 'stage_07',
+    domain: 'spelling',
+    taskType: 'orthographic_choice',
+    difficultyTier: 'medium',
+    isPractice: false,
+    promptText: "⚒️ Vowel Team Spell: Which is the correct spelling for 'RAIN' (falling raindrops)?",
+    audioPromptText: "Find the correct spelling for: Rain! As in, raindrops falling from the sky.",
+    options: [
+      { id: 'opt_rane', label: 'RANE', isCorrect: false, errorType: 'SILENT_E_OVERGENERALIZATION' },
+      { id: 'opt_rain', label: 'RAIN', isCorrect: true },
+      { id: 'opt_rayn', label: 'RAYN', isCorrect: false, errorType: 'PHONETIC_SPELLING' },
+      { id: 'opt_rein', label: 'REIN', isCorrect: false, errorType: 'HOMOPHONE_ORTHOGRAPHY' },
+    ],
+    expectedAnswerId: 'opt_rain',
+  },
+  {
+    id: 's07_m02',
+    stageId: 'stage_07',
+    domain: 'spelling',
+    taskType: 'orthographic_choice',
+    difficultyTier: 'medium',
+    isPractice: false,
+    promptText: "⚒️ Silent-E Spell: Which is the correct spelling for 'SMILE'?",
+    audioPromptText: "Find the correct spelling for: Smile! As in, smile for the picture.",
+    options: [
+      { id: 'opt_smyle', label: 'SMYLE', isCorrect: false, errorType: 'PHONETIC_Y_SUBSTITUTION' },
+      { id: 'opt_smil', label: 'SMIL', isCorrect: false, errorType: 'OMITTED_SILENT_E' },
+      { id: 'opt_smile', label: 'SMILE', isCorrect: true },
+      { id: 'opt_smeil', label: 'SMEIL', isCorrect: false, errorType: 'VOWEL_TEAM_CONFUSION' },
+    ],
+    expectedAnswerId: 'opt_smile',
+  },
+  // Hard Tier
+  {
+    id: 's07_h01',
+    stageId: 'stage_07',
+    domain: 'spelling',
+    taskType: 'orthographic_choice',
+    difficultyTier: 'hard',
+    isPractice: false,
+    promptText: "⚒️ Glowing Starlight: Which is the correct spelling for 'LIGHT'?",
+    audioPromptText: "Find the correct spelling for: Light! As in, the warm sunlight.",
+    options: [
+      { id: 'opt_lite', label: 'LITE', isCorrect: false, errorType: 'COLLOQUIAL_SIMPLIFICATION' },
+      { id: 'opt_lyte', label: 'LYTE', isCorrect: false, errorType: 'PHONETIC_Y_SUBSTITUTION' },
+      { id: 'opt_light', label: 'LIGHT', isCorrect: true },
+      { id: 'opt_lait', label: 'LAIT', isCorrect: false, errorType: 'VOWEL_TEAM_ERROR' },
+    ],
+    expectedAnswerId: 'opt_light',
+  },
+  {
+    id: 's07_h02',
+    stageId: 'stage_07',
+    domain: 'spelling',
+    taskType: 'orthographic_choice',
+    difficultyTier: 'hard',
+    isPractice: false,
+    promptText: "⚒️ Action Spell: Which is the correct spelling for 'CATCH' (catch the ball)?",
+    audioPromptText: "Find the correct spelling for: Catch! As in, catch the ball.",
+    options: [
+      { id: 'opt_cach', label: 'CACH', isCorrect: false, errorType: 'OMITTED_TRIGRAPH_T' },
+      { id: 'opt_catch', label: 'CATCH', isCorrect: true },
+      { id: 'opt_katch', label: 'KATCH', isCorrect: false, errorType: 'INITIAL_K_CONFUSION' },
+      { id: 'opt_cotch', label: 'COTCH', isCorrect: false, errorType: 'VOWEL_CONFUSION' },
+    ],
+    expectedAnswerId: 'opt_catch',
+  },
+];
+
+// ── STAGE 08: RAPID AUTOMATIZED NAMING (RAN - SPEED MOUNTAIN) ─────────────────
+export const STAGE_08_ITEMS: AssessmentCorpusItem[] = [
+  // Practice Item
+  {
+    id: 's08_p01',
+    stageId: 'stage_08',
+    domain: 'rapid_naming',
+    taskType: 'rapid_color_naming',
+    difficultyTier: 'easy',
+    isPractice: true,
+    promptText: "⚡️ Speed Mountain Warm-Up: Quick! Tap the RED circle!",
+    audioPromptText: "As fast as you can, tap the red circle!",
+    displayStimulus: "🔴",
+    options: [
+      { id: 'opt_blue', label: 'BLUE 🔵', isCorrect: false },
+      { id: 'opt_red', label: 'RED 🔴', isCorrect: true },
+      { id: 'opt_green', label: 'GREEN 🟢', isCorrect: false },
+    ],
+    expectedAnswerId: 'opt_red',
+  },
+  // Easy Tier
+  {
+    id: 's08_e01',
+    stageId: 'stage_08',
+    domain: 'rapid_naming',
+    taskType: 'rapid_object_naming',
+    difficultyTier: 'easy',
+    isPractice: false,
+    promptText: "⚡️ Lightning Speed: Name the picture immediately: SUN ☀️!",
+    audioPromptText: "Speed match! What is this picture? Tap it quickly!",
+    displayStimulus: "☀️",
+    options: [
+      { id: 'opt_star', label: 'STAR ⭐️', isCorrect: false, errorType: 'VISUAL_SIMILARITY_ERROR' },
+      { id: 'opt_sun', label: 'SUN ☀️', isCorrect: true },
+      { id: 'opt_moon', label: 'MOON 🌙', isCorrect: false, errorType: 'CELESTIAL_DISTRACTOR' },
+    ],
+    expectedAnswerId: 'opt_sun',
+  },
+  {
+    id: 's08_e02',
+    stageId: 'stage_08',
+    domain: 'rapid_naming',
+    taskType: 'rapid_object_naming',
+    difficultyTier: 'easy',
+    isPractice: false,
+    promptText: "⚡️ Lightning Speed: Name the picture immediately: APPLE 🍎!",
+    audioPromptText: "Speed match! What is this picture? Tap it quickly!",
+    displayStimulus: "🍎",
+    options: [
+      { id: 'opt_banana', label: 'BANANA 🍌', isCorrect: false, errorType: 'SEMANTIC_CATEGORY_DISTRACTOR' },
+      { id: 'opt_apple', label: 'APPLE 🍎', isCorrect: true },
+      { id: 'opt_grape', label: 'GRAPE 🍇', isCorrect: false, errorType: 'SEMANTIC_CATEGORY_DISTRACTOR' },
+    ],
+    expectedAnswerId: 'opt_apple',
+  },
+  // Medium Tier
+  {
+    id: 's08_m01',
+    stageId: 'stage_08',
+    domain: 'rapid_naming',
+    taskType: 'rapid_letter_naming',
+    difficultyTier: 'medium',
+    isPractice: false,
+    promptText: "⚡️ Rapid Symbol Match: Quick! Find letter 'B'!",
+    audioPromptText: "Quickly tap the matching letter B!",
+    displayStimulus: "B",
+    options: [
+      { id: 'opt_D', label: 'D', isCorrect: false, errorType: 'ORTHOGRAPHIC_REVERSAL_OBSERVATION' },
+      { id: 'opt_P', label: 'P', isCorrect: false, errorType: 'ORTHOGRAPHIC_REVERSAL_OBSERVATION' },
+      { id: 'opt_B', label: 'B', isCorrect: true },
+      { id: 'opt_Q', label: 'Q', isCorrect: false, errorType: 'ORTHOGRAPHIC_REVERSAL_OBSERVATION' },
+    ],
+    expectedAnswerId: 'opt_B',
+    reversalDistractorPresent: true,
+  },
+  {
+    id: 's08_m02',
+    stageId: 'stage_08',
+    domain: 'rapid_naming',
+    taskType: 'rapid_digit_naming',
+    difficultyTier: 'medium',
+    isPractice: false,
+    promptText: "⚡️ Rapid Digit Match: Quick! Find number '7'!",
+    audioPromptText: "Quickly tap the matching number 7!",
+    displayStimulus: "7",
+    options: [
+      { id: 'opt_1', label: '1', isCorrect: false, errorType: 'VISUAL_SIMILARITY_DIGIT' },
+      { id: 'opt_7', label: '7', isCorrect: true },
+      { id: 'opt_4', label: '4', isCorrect: false, errorType: 'ORTHOGRAPHIC_NEIGHBOR' },
+      { id: 'opt_9', label: '9', isCorrect: false, errorType: 'DIGIT_DISTRACTOR' },
+    ],
+    expectedAnswerId: 'opt_7',
+  },
+  // Hard Tier
+  {
+    id: 's08_h01',
+    stageId: 'stage_08',
+    domain: 'rapid_naming',
+    taskType: 'rapid_alphanumeric_switch',
+    difficultyTier: 'hard',
+    isPractice: false,
+    promptText: "⚡️ Fast Alphanumeric Switch: Match letter 'K'!",
+    audioPromptText: "Fast switch! Match letter K immediately!",
+    displayStimulus: "K",
+    options: [
+      { id: 'opt_H', label: 'H', isCorrect: false, errorType: 'VISUAL_SIMILARITY_LETTER' },
+      { id: 'opt_X', label: 'X', isCorrect: false, errorType: 'ANGULAR_DISTRACTOR' },
+      { id: 'opt_K', label: 'K', isCorrect: true },
+      { id: 'opt_R', label: 'R', isCorrect: false, errorType: 'ORTHOGRAPHIC_NEIGHBOR' },
+    ],
+    expectedAnswerId: 'opt_K',
+  },
+  {
+    id: 's08_h02',
+    stageId: 'stage_08',
+    domain: 'rapid_naming',
+    taskType: 'rapid_alphanumeric_switch',
+    difficultyTier: 'hard',
+    isPractice: false,
+    promptText: "⚡️ Fast Alphanumeric Switch: Match number '8'!",
+    audioPromptText: "Fast switch! Match number 8 immediately!",
+    displayStimulus: "8",
+    options: [
+      { id: 'opt_3', label: '3', isCorrect: false, errorType: 'CURVE_DISTRACTOR' },
+      { id: 'opt_0', label: '0', isCorrect: false, errorType: 'OVAL_DISTRACTOR' },
+      { id: 'opt_8', label: '8', isCorrect: true },
+      { id: 'opt_6', label: '6', isCorrect: false, errorType: 'LOOP_DISTRACTOR' },
+    ],
+    expectedAnswerId: 'opt_8',
+  },
+];
+
+// ── STAGE 09: WORKING MEMORY (MEMORY GROVE) ───────────────────────────────────
+export const STAGE_09_ITEMS: AssessmentCorpusItem[] = [
+  // Practice Item
+  {
+    id: 's09_p01',
+    stageId: 'stage_09',
+    domain: 'working_memory',
+    taskType: 'forward_span',
+    difficultyTier: 'easy',
+    isPractice: true,
+    promptText: "🧠 Glowing Fireflies: Remember Dog 🐶 then Cat 🐱. Tap the same order!",
+    audioPromptText: "Remember the order: Dog... then Cat. Which option has the same order?",
+    displayStimulus: "🐶 ➔ 🐱",
+    options: [
+      { id: 'opt_cat_dog', label: '🐱 Cat ➔ 🐶 Dog', isCorrect: false, errorType: 'ORDER_INVERSION_ERROR' },
+      { id: 'opt_dog_cat', label: '🐶 Dog ➔ 🐱 Cat', isCorrect: true },
+      { id: 'opt_frog_cat', label: '🐸 Frog ➔ 🐱 Cat', isCorrect: false, errorType: 'ITEM_SUBSTITUTION' },
+    ],
+    expectedAnswerId: 'opt_dog_cat',
+  },
+  // Easy Tier
+  {
+    id: 's09_e01',
+    stageId: 'stage_09',
+    domain: 'working_memory',
+    taskType: 'forward_span',
+    difficultyTier: 'easy',
+    isPractice: false,
+    promptText: "🧠 Firefly Pattern: STAR ⭐️ ➔ MOON 🌙 ➔ SUN ☀️! Tap matching sequence!",
+    audioPromptText: "Remember this order: Star... Moon... Sun. Tap the matching sequence!",
+    displayStimulus: "⭐️ ➔ 🌙 ➔ ☀️",
+    options: [
+      { id: 'opt_moon_star_sun', label: '🌙 ➔ ⭐️ ➔ ☀️', isCorrect: false, errorType: 'TRANSPOSITION_ERROR' },
+      { id: 'opt_star_moon_sun', label: '⭐️ ➔ 🌙 ➔ ☀️', isCorrect: true },
+      { id: 'opt_sun_moon_star', label: '☀️ ➔ 🌙 ➔ ⭐️', isCorrect: false, errorType: 'REVERSE_ORDER_ERROR' },
+    ],
+    expectedAnswerId: 'opt_star_moon_sun',
+  },
+  {
+    id: 's09_e02',
+    stageId: 'stage_09',
+    domain: 'working_memory',
+    taskType: 'forward_digit_span',
+    difficultyTier: 'easy',
+    isPractice: false,
+    promptText: "🧠 Number Memory: 2 ➔ 5 ➔ 9! Tap matching sequence!",
+    audioPromptText: "Remember these numbers in order: 2... 5... 9. Tap the matching sequence!",
+    displayStimulus: "2 ➔ 5 ➔ 9",
+    options: [
+      { id: 'opt_529', label: '5 ➔ 2 ➔ 9', isCorrect: false, errorType: 'TRANSPOSITION_ERROR' },
+      { id: 'opt_295', label: '2 ➔ 9 ➔ 5', isCorrect: false, errorType: 'TRANSPOSITION_ERROR' },
+      { id: 'opt_259', label: '2 ➔ 5 ➔ 9', isCorrect: true },
+    ],
+    expectedAnswerId: 'opt_259',
+  },
+  // Medium Tier
+  {
+    id: 's09_m01',
+    stageId: 'stage_09',
+    domain: 'working_memory',
+    taskType: 'backward_span',
+    difficultyTier: 'medium',
+    isPractice: false,
+    promptText: "🧠 BACKWARD REVERSE: Listen: RED 🔴 then BLUE 🔵. Tap in BACKWARD order!",
+    audioPromptText: "Reverse memory challenge! Listen: Red... then Blue. Tap them in backward reverse order!",
+    displayStimulus: "🔴 ➔ 🔵  (Tap in BACKWARD order!)",
+    options: [
+      { id: 'opt_red_blue', label: '🔴 Red ➔ 🔵 Blue (Forward)', isCorrect: false, errorType: 'FORWARD_PERSEVERATION_ERROR' },
+      { id: 'opt_blue_red', label: '🔵 Blue ➔ 🔴 Red (Reversed)', isCorrect: true },
+      { id: 'opt_green_red', label: '🟢 Green ➔ 🔴 Red', isCorrect: false, errorType: 'ITEM_INTRUSION' },
+    ],
+    expectedAnswerId: 'opt_blue_red',
+  },
+  {
+    id: 's09_m02',
+    stageId: 'stage_09',
+    domain: 'working_memory',
+    taskType: 'forward_span_complex',
+    difficultyTier: 'medium',
+    isPractice: false,
+    promptText: "🧠 4 Animals: Lion 🦁 ➔ Frog 🐸 ➔ Duck 🦆 ➔ Bear 🐻! Tap matching sequence!",
+    audioPromptText: "Remember 4 animals in order: Lion... Frog... Duck... Bear. Tap the matching sequence!",
+    displayStimulus: "🦁 ➔ 🐸 ➔ 🦆 ➔ 🐻",
+    options: [
+      { id: 'opt_frog_lion_duck_bear', label: '🐸 ➔ 🦁 ➔ 🦆 ➔ 🐻', isCorrect: false, errorType: 'INITIAL_TRANSPOSITION' },
+      { id: 'opt_lion_frog_duck_bear', label: '🦁 ➔ 🐸 ➔ 🦆 ➔ 🐻', isCorrect: true },
+      { id: 'opt_lion_duck_frog_bear', label: '🦁 ➔ 🦆 ➔ 🐸 ➔ 🐻', isCorrect: false, errorType: 'MEDIAL_TRANSPOSITION' },
+    ],
+    expectedAnswerId: 'opt_lion_frog_duck_bear',
+  },
+  // Hard Tier
+  {
+    id: 's09_h01',
+    stageId: 'stage_09',
+    domain: 'working_memory',
+    taskType: 'backward_digit_span',
+    difficultyTier: 'hard',
+    isPractice: false,
+    promptText: "🧠 BACKWARD REVERSE: Numbers: 3 ➔ 8 ➔ 1. Tap in REVERSE (Backward) order!",
+    audioPromptText: "Reverse memory challenge! Numbers: 3... 8... 1. Tap them in reverse order!",
+    displayStimulus: "3 ➔ 8 ➔ 1  (Tap in BACKWARD order!)",
+    options: [
+      { id: 'opt_381', label: '3 ➔ 8 ➔ 1 (Forward)', isCorrect: false, errorType: 'FORWARD_PERSEVERATION_ERROR' },
+      { id: 'opt_813', label: '8 ➔ 1 ➔ 3', isCorrect: false, errorType: 'INCOMPLETE_REVERSAL' },
+      { id: 'opt_183', label: '1 ➔ 8 ➔ 3 (Reversed)', isCorrect: true },
+      { id: 'opt_138', label: '1 ➔ 3 ➔ 8', isCorrect: false, errorType: 'MEDIAL_ERROR' },
+    ],
+    expectedAnswerId: 'opt_183',
+  },
+  {
+    id: 's09_h02',
+    stageId: 'stage_09',
+    domain: 'working_memory',
+    taskType: 'backward_object_span',
+    difficultyTier: 'hard',
+    isPractice: false,
+    promptText: "🧠 BACKWARD REVERSE: Apple 🍎 ➔ Car 🚗 ➔ Bird 🐦. Tap in REVERSE order!",
+    audioPromptText: "Reverse memory challenge! Apple... Car... Bird. Tap them in backward reverse order!",
+    displayStimulus: "🍎 ➔ 🚗 ➔ 🐦  (Tap in BACKWARD order!)",
+    options: [
+      { id: 'opt_apple_car_bird', label: '🍎 Apple ➔ 🚗 Car ➔ 🐦 Bird', isCorrect: false, errorType: 'FORWARD_PERSEVERATION_ERROR' },
+      { id: 'opt_bird_car_apple', label: '🐦 Bird ➔ 🚗 Car ➔ 🍎 Apple', isCorrect: true },
+      { id: 'opt_car_bird_apple', label: '🚗 Car ➔ 🐦 Bird ➔ 🍎 Apple', isCorrect: false, errorType: 'INCOMPLETE_REVERSAL' },
+      { id: 'opt_bird_apple_car', label: '🐦 Bird ➔ 🍎 Apple ➔ 🚗 Car', isCorrect: false, errorType: 'MEDIAL_ERROR' },
+    ],
+    expectedAnswerId: 'opt_bird_car_apple',
+  },
+];
+
+// ── STAGE 10: ATTENTION & PROCESSING SPEED (STAR FOCUS) ────────────────────────
+export const STAGE_10_ITEMS: AssessmentCorpusItem[] = [
+  // Practice Item
+  {
+    id: 's10_p01',
+    stageId: 'stage_10',
+    domain: 'attention_processing_speed',
+    taskType: 'visual_target_cancellation',
+    difficultyTier: 'easy',
+    isPractice: true,
+    promptText: "🔭 Telescope Focus: Tap the GOLDEN STAR ⭐️ (Ignore crescent moon 🌙)!",
+    audioPromptText: "Focus your eyes! Tap the golden star, but do not tap the moon!",
+    displayStimulus: "⭐️",
+    options: [
+      { id: 'opt_moon', label: '🌙 Crescent Moon', isCorrect: false, errorType: 'DISTRACTOR_SELECTION' },
+      { id: 'opt_star', label: '⭐️ Golden Star', isCorrect: true },
+    ],
+    expectedAnswerId: 'opt_star',
+  },
+  // Easy Tier
+  {
+    id: 's10_e01',
+    stageId: 'stage_10',
+    domain: 'attention_processing_speed',
+    taskType: 'visual_search_speed',
+    difficultyTier: 'easy',
+    isPractice: false,
+    promptText: "🔭 Telescope Search: Spot the Sparkly Diamond 💎!",
+    audioPromptText: "Quickly spot the diamond and tap it!",
+    displayStimulus: "💎",
+    options: [
+      { id: 'opt_circle', label: '⚪️ Circle', isCorrect: false, errorType: 'SHAPE_DISTRACTOR' },
+      { id: 'opt_diamond', label: '💎 Diamond', isCorrect: true },
+      { id: 'opt_square', label: '⬛️ Square', isCorrect: false, errorType: 'SHAPE_DISTRACTOR' },
+    ],
+    expectedAnswerId: 'opt_diamond',
+  },
+  {
+    id: 's10_e02',
+    stageId: 'stage_10',
+    domain: 'attention_processing_speed',
+    taskType: 'visual_search_speed',
+    difficultyTier: 'easy',
+    isPractice: false,
+    promptText: "🔭 Telescope Search: Spot the Golden Key 🔑!",
+    audioPromptText: "Quickly spot the golden key and tap it!",
+    displayStimulus: "🔑",
+    options: [
+      { id: 'opt_lock', label: '🔒 Lock', isCorrect: false, errorType: 'SEMANTIC_FLANKER' },
+      { id: 'opt_box', label: '📦 Box', isCorrect: false, errorType: 'UNRELATED_DISTRACTOR' },
+      { id: 'opt_key', label: '🔑 Golden Key', isCorrect: true },
+    ],
+    expectedAnswerId: 'opt_key',
+  },
+  // Medium Tier
+  {
+    id: 's10_m01',
+    stageId: 'stage_10',
+    domain: 'attention_processing_speed',
+    taskType: 'selective_visual_attention',
+    difficultyTier: 'medium',
+    isPractice: false,
+    promptText: "🔭 Focus Search: Spot the Big Owl 🦉 among the other birds!",
+    audioPromptText: "Scan carefully! Spot the big owl and tap it!",
+    displayStimulus: "🦉",
+    options: [
+      { id: 'opt_bird', label: '🐦 Songbird', isCorrect: false, errorType: 'CATEGORY_FLANKER' },
+      { id: 'opt_duck', label: '🦆 Duck', isCorrect: false, errorType: 'CATEGORY_FLANKER' },
+      { id: 'opt_owl', label: '🦉 Big Owl', isCorrect: true },
+      { id: 'opt_eagle', label: '🦅 Hawk', isCorrect: false, errorType: 'CATEGORY_FLANKER' },
+    ],
+    expectedAnswerId: 'opt_owl',
+  },
+  {
+    id: 's10_m02',
+    stageId: 'stage_10',
+    domain: 'attention_processing_speed',
+    taskType: 'selective_visual_attention',
+    difficultyTier: 'medium',
+    isPractice: false,
+    promptText: "🔭 Focus Search: Spot the Smiling Star 🌟 with five points!",
+    audioPromptText: "Scan carefully! Spot the smiling star with five points!",
+    displayStimulus: "🌟",
+    options: [
+      { id: 'opt_plain_star', label: '⭐️ Plain Star', isCorrect: false, errorType: 'FEATURE_SIMILARITY_ERROR' },
+      { id: 'opt_sparkle', label: '✨ Sparkles', isCorrect: false, errorType: 'SHAPE_FLANKER' },
+      { id: 'opt_smile_star', label: '🌟 Smiling Star', isCorrect: true },
+      { id: 'opt_sun_burst', label: '💫 Star Trail', isCorrect: false, errorType: 'MOTION_DISTRACTOR' },
+    ],
+    expectedAnswerId: 'opt_smile_star',
+  },
+  // Hard Tier
+  {
+    id: 's10_h01',
+    stageId: 'stage_10',
+    domain: 'attention_processing_speed',
+    taskType: 'inhibitory_visual_control',
+    difficultyTier: 'hard',
+    isPractice: false,
+    promptText: "🔭 Inhibition Test: Tap the GREEN CIRCLE 🟢! (Ignore Red Circles and Green Squares)",
+    audioPromptText: "Focus test! Tap the green circle, but do not tap the red circle or green square!",
+    displayStimulus: "🟢 (Shape = Circle, Color = Green)",
+    options: [
+      { id: 'opt_red_circle', label: '🔴 Red Circle', isCorrect: false, errorType: 'COLOR_INHIBITION_FAILURE' },
+      { id: 'opt_green_square', label: '🟩 Green Square', isCorrect: false, errorType: 'SHAPE_INHIBITION_FAILURE' },
+      { id: 'opt_blue_circle', label: '🟦 Blue Square', isCorrect: false, errorType: 'DOUBLE_DISTRACTOR' },
+      { id: 'opt_green_circle', label: '🟢 Green Circle', isCorrect: true },
+    ],
+    expectedAnswerId: 'opt_green_circle',
+  },
+  {
+    id: 's10_h02',
+    stageId: 'stage_10',
+    domain: 'attention_processing_speed',
+    taskType: 'inhibitory_visual_control',
+    difficultyTier: 'hard',
+    isPractice: false,
+    promptText: "🔭 Orientation Test: Tap the LEFT Arrow ⬅️ among the arrows!",
+    audioPromptText: "Orientation test! Tap the arrow pointing left!",
+    displayStimulus: "⬅️",
+    options: [
+      { id: 'opt_right', label: '➡️ Right Arrow', isCorrect: false, errorType: 'SPATIAL_INVERSION_ERROR' },
+      { id: 'opt_up', label: '⬆️ Up Arrow', isCorrect: false, errorType: 'VERTICAL_ORIENTATION_ERROR' },
+      { id: 'opt_left', label: '⬅️ Left Arrow', isCorrect: true },
+      { id: 'opt_down', label: '⬇️ Down Arrow', isCorrect: false, errorType: 'VERTICAL_ORIENTATION_ERROR' },
+    ],
+    expectedAnswerId: 'opt_left',
   },
 ];

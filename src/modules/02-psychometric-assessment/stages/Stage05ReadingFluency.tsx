@@ -1,11 +1,10 @@
 /**
- * Stage01LetterKnowledge.tsx — Stage 01: Letter Knowledge & GPC Screening
+ * Stage05ReadingFluency.tsx — Stage 05: Reading Fluency & Sentence Verification
  *
  * Measures:
- *   - Grapheme Identification & Discrimination
- *   - Upper/Lowercase Case Matching
- *   - Letter-Sound Association (GPC)
- *   - Observational logging of orthographic reversal distractors (b/d/p/q)
+ *   - Sentence-level decoding automaticity, parsing speed, and semantic verification
+ *   - Tests simple sentences (CVC/HFW), compound sentences, and complex clauses
+ *   - Records reading reaction latency (response_time_ms) and verification accuracy
  *
  * Adaptive Logic (Centralized via adaptiveEngine):
  *   - Starts at Medium tier items.
@@ -21,16 +20,16 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Volume2, Sparkles, CheckCircle2 } from 'lucide-react';
 import { Lyra } from '@/modules/04-attention-agent/Lyra';
 import { audioEngine } from '@/modules/audio/audioEngine';
-import { STAGE_01_ITEMS, type AssessmentCorpusItem } from '@/data/assessmentCorpus';
+import { STAGE_05_ITEMS, type AssessmentCorpusItem } from '@/data/assessmentCorpus';
 import { useAssessmentStore } from '@/stores/useAssessmentStore';
 import { evaluateAdaptiveStep, ensureQueueSufficiency, DEFAULT_ADAPTIVE_CONFIG } from '@/lib/adaptiveEngine';
 
-interface Stage01Props {
+interface Stage05Props {
   onStageComplete: () => void;
   onExit?: () => void;
 }
 
-export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
+export function Stage05ReadingFluency({ onStageComplete }: Stage05Props) {
   const { recordResponse, incrementAudioReplay } = useAssessmentStore();
 
   const [activeItemIndex, setActiveItemIndex] = useState(0);
@@ -40,15 +39,14 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
 
   // Dynamic adaptive item queue
   const [queue, setQueue] = useState<AssessmentCorpusItem[]>(() => {
-    const practice = STAGE_01_ITEMS.find((i) => i.isPractice);
-    const scoredMedium = STAGE_01_ITEMS.filter((i) => !i.isPractice && i.difficultyTier === 'medium');
+    const practice = STAGE_05_ITEMS.find((i) => i.isPractice);
+    const scoredMedium = STAGE_05_ITEMS.filter((i) => !i.isPractice && i.difficultyTier === 'medium');
     return practice ? [practice, ...scoredMedium] : scoredMedium;
   });
 
   const consecutiveCorrectRef = useRef(0);
   const consecutiveIncorrectRef = useRef(0);
   const validScoredCountRef = useRef(0);
-  const mountTimeRef = useRef<number>(Date.now());
   const itemStartTimeRef = useRef<number>(Date.now());
   const attemptsCountRef = useRef<number>(0);
 
@@ -68,7 +66,6 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
   useEffect(() => {
     if (!currentItem) return;
     itemStartTimeRef.current = Date.now();
-    mountTimeRef.current = Date.now();
     setSelectedOptionId(null);
     setIsProcessingSelection(false);
     attemptsCountRef.current = 0;
@@ -104,9 +101,9 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
       audioEngine.playEncourage();
     }
 
-    // Record response telemetry (TASK 2)
+    // Record response telemetry
     recordResponse({
-      domain: 'letter_knowledge',
+      domain: 'reading_fluency',
       task_type: currentItem.taskType,
       item_id: currentItem.id,
       difficulty_tier: currentItem.difficultyTier,
@@ -125,7 +122,7 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
       error_classification: option.errorType ?? null,
     });
 
-    // Centralized adaptive evaluation (TASK 1)
+    // Centralized adaptive evaluation
     const evalResult = evaluateAdaptiveStep({
       isPractice: currentItem.isPractice,
       isCorrect: option.isCorrect,
@@ -142,14 +139,13 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
     consecutiveIncorrectRef.current = evalResult.nextConsecutiveIncorrect;
 
     if (evalResult.shouldEscalateToHard) {
-      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_01_ITEMS, 'hard'));
+      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_05_ITEMS, 'hard'));
       setActiveTier('hard');
     } else if (evalResult.shouldBranchToEasy) {
-      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_01_ITEMS, 'easy'));
+      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_05_ITEMS, 'easy'));
       setActiveTier('easy');
     } else if (queue.length - (activeItemIndex + 1) + evalResult.nextValidScoredCount < DEFAULT_ADAPTIVE_CONFIG.minScoredItems) {
-      // Ensure remaining queue has sufficient items to reach minimum 4 scored items
-      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_01_ITEMS, activeTier === 'hard' ? 'easy' : 'hard'));
+      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_05_ITEMS, activeTier === 'hard' ? 'easy' : 'hard'));
     }
 
     // Advance after brief pause
@@ -166,12 +162,15 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
     if (!currentItem || isProcessingSelection) return;
 
     recordResponse({
-      domain: 'letter_knowledge',
+      domain: 'reading_fluency',
       task_type: currentItem.taskType,
       item_id: currentItem.id,
       difficulty_tier: currentItem.difficultyTier,
       is_practice_item: currentItem.isPractice,
-      presented_content: { prompt: currentItem.promptText },
+      presented_content: {
+        prompt: currentItem.promptText,
+        stimulus: currentItem.displayStimulus ?? null,
+      },
       expected_answer: currentItem.expectedAnswerId,
       selected_answer: null,
       is_correct: false,
@@ -182,9 +181,8 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
       error_classification: 'SKIPPED_BY_USER',
     });
 
-    // Ensure queue has sufficient remaining items if skipped
     if (queue.length - (activeItemIndex + 1) + validScoredCountRef.current < DEFAULT_ADAPTIVE_CONFIG.minScoredItems) {
-      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_01_ITEMS, activeTier === 'hard' ? 'easy' : 'hard'));
+      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_05_ITEMS, activeTier === 'hard' ? 'easy' : 'hard'));
     }
 
     if (activeItemIndex + 1 < queue.length) {
@@ -197,7 +195,7 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
   if (!currentItem) {
     return (
       <div className="flex flex-col items-center justify-center p-6 text-center">
-        <p className="text-sm font-bold text-slate-700">Stage 01 complete!</p>
+        <p className="text-sm font-bold text-slate-700">Stage 05 complete!</p>
       </div>
     );
   }
@@ -210,11 +208,11 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
       {/* Top Header Bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-xs">
-            01
+          <div className="w-8 h-8 rounded-xl bg-cyan-100 text-cyan-700 flex items-center justify-center font-black text-xs">
+            05
           </div>
           <div>
-            <h2 className="text-sm font-black text-slate-800">Island 1: Letter Forest 🌳</h2>
+            <h2 className="text-sm font-black text-slate-800">Island 5: Fluency Falls 🏄</h2>
             <p className="text-[11px] font-semibold text-slate-500">
               {currentItem.isPractice ? 'Warm-Up Practice' : `Item ${scoredIndex} of ${totalScored}`}
             </p>
@@ -225,10 +223,10 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
           <button
             onClick={handleReplayAudio}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-100 text-purple-700 text-xs font-bold hover:bg-purple-200 transition active:scale-95 cursor-pointer"
-            aria-label="Replay audio prompt"
+            aria-label="Replay audio sentence prompt"
           >
             <Volume2 size={15} />
-            <span>Hear Again</span>
+            <span>Hear Prompt</span>
           </button>
           <Lyra size={36} />
         </div>
@@ -259,11 +257,11 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
       <div
         className="p-4 rounded-3xl border-2 flex items-start gap-3.5 shadow-sm"
         style={{
-          background: currentItem.isPractice ? '#faf5ff' : 'white',
-          borderColor: currentItem.isPractice ? '#d8b4fe' : '#e2e8f0',
+          background: currentItem.isPractice ? '#faf5ff' : '#ecfeff',
+          borderColor: currentItem.isPractice ? '#d8b4fe' : '#a5f3fc',
         }}
       >
-        <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-2xl bg-cyan-100 text-cyan-600 flex items-center justify-center shrink-0">
           <Sparkles size={20} />
         </div>
         <div className="space-y-0.5">
@@ -278,23 +276,25 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
         </div>
       </div>
 
-      {/* Visual Stimulus (if uppercase/lowercase match) */}
+      {/* Prominent Sentence Stimulus Card */}
       {currentItem.displayStimulus && (
         <div className="flex flex-col items-center justify-center py-2">
-          <div className="w-20 h-20 rounded-3xl bg-sky-50 border-3 border-sky-300 flex items-center justify-center shadow-inner">
-            <span className="text-4xl font-black text-sky-700">{currentItem.displayStimulus}</span>
+          <div className="w-full p-5 rounded-3xl bg-white border-3 border-cyan-300 shadow-md text-center">
+            <span className="text-lg sm:text-xl font-black text-slate-800 leading-relaxed">
+              "{currentItem.displayStimulus}"
+            </span>
           </div>
         </div>
       )}
 
-      {/* Option Choices Grid */}
-      <div className="grid grid-cols-2 gap-3.5 pt-2 flex-1 items-center">
+      {/* Options Grid (True / False) */}
+      <div className="grid grid-cols-2 gap-4 pt-2 flex-1 items-center">
         {currentItem.options.map((opt) => {
           const isSelected = selectedOptionId === opt.id;
           const isCorrect = opt.isCorrect;
 
           let btnBg = 'white';
-          let btnBorder = '2px solid #e2e8f0';
+          let btnBorder = '2.5px solid #e2e8f0';
           let textColor = 'var(--color-ink)';
 
           if (isSelected) {
@@ -314,18 +314,17 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
               key={opt.id}
               onClick={() => handleSelectOption(opt)}
               disabled={isProcessingSelection}
-              className="min-h-[80px] p-4 rounded-3xl flex flex-col items-center justify-center gap-1 shadow-sm transition-all duration-150 active:scale-95 cursor-pointer touch-target hover:border-slate-300 disabled:cursor-not-allowed"
+              className="min-h-[90px] p-4 rounded-3xl flex flex-col items-center justify-center gap-1 shadow-sm transition-all duration-150 active:scale-95 cursor-pointer touch-target hover:border-slate-300 disabled:cursor-not-allowed"
               style={{
                 background: btnBg,
                 border: btnBorder,
                 color: textColor,
               }}
             >
-              <span className="text-3xl font-black">{opt.label}</span>
-              {opt.subLabel && <span className="text-[11px] font-semibold opacity-75">{opt.subLabel}</span>}
+              <span className="text-xl sm:text-2xl font-black">{opt.label}</span>
               {isSelected && (
                 <div className="animate-fade-in">
-                  <CheckCircle2 size={16} className={isCorrect ? 'text-green-600' : 'text-purple-600'} />
+                  <CheckCircle2 size={18} className={isCorrect ? 'text-green-600' : 'text-purple-600'} />
                 </div>
               )}
             </button>
@@ -344,7 +343,7 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
         </button>
 
         <span className="text-[11px] font-semibold text-slate-400">
-          Island 1 of 10
+          Island 5 of 10
         </span>
       </div>
     </div>

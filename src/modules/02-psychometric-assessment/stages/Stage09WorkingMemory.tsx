@@ -1,11 +1,9 @@
 /**
- * Stage01LetterKnowledge.tsx — Stage 01: Letter Knowledge & GPC Screening
+ * Stage09WorkingMemory.tsx — Stage 09: Working Memory & Sequence Span (Memory Grove)
  *
  * Measures:
- *   - Grapheme Identification & Discrimination
- *   - Upper/Lowercase Case Matching
- *   - Letter-Sound Association (GPC)
- *   - Observational logging of orthographic reversal distractors (b/d/p/q)
+ *   - Phonological loop storage capacity (Forward item/digit span)
+ *   - Executive working memory manipulation (Backward reverse sequence retrieval)
  *
  * Adaptive Logic (Centralized via adaptiveEngine):
  *   - Starts at Medium tier items.
@@ -18,19 +16,19 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Volume2, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Volume2, CheckCircle2, Brain } from 'lucide-react';
 import { Lyra } from '@/modules/04-attention-agent/Lyra';
 import { audioEngine } from '@/modules/audio/audioEngine';
-import { STAGE_01_ITEMS, type AssessmentCorpusItem } from '@/data/assessmentCorpus';
+import { STAGE_09_ITEMS, type AssessmentCorpusItem } from '@/data/assessmentCorpus';
 import { useAssessmentStore } from '@/stores/useAssessmentStore';
 import { evaluateAdaptiveStep, ensureQueueSufficiency, DEFAULT_ADAPTIVE_CONFIG } from '@/lib/adaptiveEngine';
 
-interface Stage01Props {
+interface Stage09Props {
   onStageComplete: () => void;
   onExit?: () => void;
 }
 
-export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
+export function Stage09WorkingMemory({ onStageComplete }: Stage09Props) {
   const { recordResponse, incrementAudioReplay } = useAssessmentStore();
 
   const [activeItemIndex, setActiveItemIndex] = useState(0);
@@ -40,15 +38,14 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
 
   // Dynamic adaptive item queue
   const [queue, setQueue] = useState<AssessmentCorpusItem[]>(() => {
-    const practice = STAGE_01_ITEMS.find((i) => i.isPractice);
-    const scoredMedium = STAGE_01_ITEMS.filter((i) => !i.isPractice && i.difficultyTier === 'medium');
+    const practice = STAGE_09_ITEMS.find((i) => i.isPractice);
+    const scoredMedium = STAGE_09_ITEMS.filter((i) => !i.isPractice && i.difficultyTier === 'medium');
     return practice ? [practice, ...scoredMedium] : scoredMedium;
   });
 
   const consecutiveCorrectRef = useRef(0);
   const consecutiveIncorrectRef = useRef(0);
   const validScoredCountRef = useRef(0);
-  const mountTimeRef = useRef<number>(Date.now());
   const itemStartTimeRef = useRef<number>(Date.now());
   const attemptsCountRef = useRef<number>(0);
 
@@ -58,7 +55,7 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.92;
+      utterance.rate = 0.88;
       utterance.pitch = 1.1;
       window.speechSynthesis.speak(utterance);
     }
@@ -68,7 +65,6 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
   useEffect(() => {
     if (!currentItem) return;
     itemStartTimeRef.current = Date.now();
-    mountTimeRef.current = Date.now();
     setSelectedOptionId(null);
     setIsProcessingSelection(false);
     attemptsCountRef.current = 0;
@@ -104,16 +100,16 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
       audioEngine.playEncourage();
     }
 
-    // Record response telemetry (TASK 2)
+    // Record response telemetry
     recordResponse({
-      domain: 'letter_knowledge',
+      domain: 'working_memory',
       task_type: currentItem.taskType,
       item_id: currentItem.id,
       difficulty_tier: currentItem.difficultyTier,
       is_practice_item: currentItem.isPractice,
       presented_content: {
+        sequence: currentItem.displayStimulus ?? null,
         prompt: currentItem.promptText,
-        stimulus: currentItem.displayStimulus ?? null,
       },
       expected_answer: currentItem.expectedAnswerId,
       selected_answer: option.id,
@@ -125,7 +121,7 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
       error_classification: option.errorType ?? null,
     });
 
-    // Centralized adaptive evaluation (TASK 1)
+    // Centralized adaptive evaluation
     const evalResult = evaluateAdaptiveStep({
       isPractice: currentItem.isPractice,
       isCorrect: option.isCorrect,
@@ -142,14 +138,13 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
     consecutiveIncorrectRef.current = evalResult.nextConsecutiveIncorrect;
 
     if (evalResult.shouldEscalateToHard) {
-      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_01_ITEMS, 'hard'));
+      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_09_ITEMS, 'hard'));
       setActiveTier('hard');
     } else if (evalResult.shouldBranchToEasy) {
-      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_01_ITEMS, 'easy'));
+      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_09_ITEMS, 'easy'));
       setActiveTier('easy');
     } else if (queue.length - (activeItemIndex + 1) + evalResult.nextValidScoredCount < DEFAULT_ADAPTIVE_CONFIG.minScoredItems) {
-      // Ensure remaining queue has sufficient items to reach minimum 4 scored items
-      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_01_ITEMS, activeTier === 'hard' ? 'easy' : 'hard'));
+      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_09_ITEMS, activeTier === 'hard' ? 'easy' : 'hard'));
     }
 
     // Advance after brief pause
@@ -166,12 +161,15 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
     if (!currentItem || isProcessingSelection) return;
 
     recordResponse({
-      domain: 'letter_knowledge',
+      domain: 'working_memory',
       task_type: currentItem.taskType,
       item_id: currentItem.id,
       difficulty_tier: currentItem.difficultyTier,
       is_practice_item: currentItem.isPractice,
-      presented_content: { prompt: currentItem.promptText },
+      presented_content: {
+        sequence: currentItem.displayStimulus ?? null,
+        prompt: currentItem.promptText,
+      },
       expected_answer: currentItem.expectedAnswerId,
       selected_answer: null,
       is_correct: false,
@@ -182,9 +180,8 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
       error_classification: 'SKIPPED_BY_USER',
     });
 
-    // Ensure queue has sufficient remaining items if skipped
     if (queue.length - (activeItemIndex + 1) + validScoredCountRef.current < DEFAULT_ADAPTIVE_CONFIG.minScoredItems) {
-      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_01_ITEMS, activeTier === 'hard' ? 'easy' : 'hard'));
+      setQueue((prev) => ensureQueueSufficiency(prev, STAGE_09_ITEMS, activeTier === 'hard' ? 'easy' : 'hard'));
     }
 
     if (activeItemIndex + 1 < queue.length) {
@@ -197,7 +194,7 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
   if (!currentItem) {
     return (
       <div className="flex flex-col items-center justify-center p-6 text-center">
-        <p className="text-sm font-bold text-slate-700">Stage 01 complete!</p>
+        <p className="text-sm font-bold text-slate-700">Stage 09 complete!</p>
       </div>
     );
   }
@@ -210,11 +207,11 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
       {/* Top Header Bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-xs">
-            01
+          <div className="w-8 h-8 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center font-black text-xs">
+            09
           </div>
           <div>
-            <h2 className="text-sm font-black text-slate-800">Island 1: Letter Forest 🌳</h2>
+            <h2 className="text-sm font-black text-slate-800">Island 9: Memory Grove 🧠</h2>
             <p className="text-[11px] font-semibold text-slate-500">
               {currentItem.isPractice ? 'Warm-Up Practice' : `Item ${scoredIndex} of ${totalScored}`}
             </p>
@@ -225,10 +222,10 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
           <button
             onClick={handleReplayAudio}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-100 text-purple-700 text-xs font-bold hover:bg-purple-200 transition active:scale-95 cursor-pointer"
-            aria-label="Replay audio prompt"
+            aria-label="Replay audio memory clue"
           >
             <Volume2 size={15} />
-            <span>Hear Again</span>
+            <span>Hear Sequence</span>
           </button>
           <Lyra size={36} />
         </div>
@@ -259,12 +256,12 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
       <div
         className="p-4 rounded-3xl border-2 flex items-start gap-3.5 shadow-sm"
         style={{
-          background: currentItem.isPractice ? '#faf5ff' : 'white',
-          borderColor: currentItem.isPractice ? '#d8b4fe' : '#e2e8f0',
+          background: currentItem.isPractice ? '#faf5ff' : '#f5f3ff',
+          borderColor: currentItem.isPractice ? '#d8b4fe' : '#ddd6fe',
         }}
       >
-        <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
-          <Sparkles size={20} />
+        <div className="w-10 h-10 rounded-2xl bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+          <Brain size={20} className="text-violet-600" />
         </div>
         <div className="space-y-0.5">
           {currentItem.isPractice && (
@@ -278,17 +275,19 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
         </div>
       </div>
 
-      {/* Visual Stimulus (if uppercase/lowercase match) */}
+      {/* Stimulus Sequence Card */}
       {currentItem.displayStimulus && (
         <div className="flex flex-col items-center justify-center py-2">
-          <div className="w-20 h-20 rounded-3xl bg-sky-50 border-3 border-sky-300 flex items-center justify-center shadow-inner">
-            <span className="text-4xl font-black text-sky-700">{currentItem.displayStimulus}</span>
+          <div className="w-full p-4 rounded-3xl bg-violet-900 text-white border-3 border-violet-400 shadow-md text-center">
+            <span className="text-lg sm:text-xl font-black tracking-wide">
+              {currentItem.displayStimulus}
+            </span>
           </div>
         </div>
       )}
 
-      {/* Option Choices Grid */}
-      <div className="grid grid-cols-2 gap-3.5 pt-2 flex-1 items-center">
+      {/* Options Grid */}
+      <div className="grid grid-cols-1 gap-3 pt-1 flex-1 items-center">
         {currentItem.options.map((opt) => {
           const isSelected = selectedOptionId === opt.id;
           const isCorrect = opt.isCorrect;
@@ -314,18 +313,17 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
               key={opt.id}
               onClick={() => handleSelectOption(opt)}
               disabled={isProcessingSelection}
-              className="min-h-[80px] p-4 rounded-3xl flex flex-col items-center justify-center gap-1 shadow-sm transition-all duration-150 active:scale-95 cursor-pointer touch-target hover:border-slate-300 disabled:cursor-not-allowed"
+              className="p-4 rounded-2xl flex items-center justify-between gap-3 shadow-sm transition-all duration-150 active:scale-97 cursor-pointer touch-target hover:border-slate-300 disabled:cursor-not-allowed text-left"
               style={{
                 background: btnBg,
                 border: btnBorder,
                 color: textColor,
               }}
             >
-              <span className="text-3xl font-black">{opt.label}</span>
-              {opt.subLabel && <span className="text-[11px] font-semibold opacity-75">{opt.subLabel}</span>}
+              <span className="text-sm sm:text-base font-black">{opt.label}</span>
               {isSelected && (
-                <div className="animate-fade-in">
-                  <CheckCircle2 size={16} className={isCorrect ? 'text-green-600' : 'text-purple-600'} />
+                <div className="shrink-0 animate-fade-in">
+                  <CheckCircle2 size={18} className={isCorrect ? 'text-green-600' : 'text-purple-600'} />
                 </div>
               )}
             </button>
@@ -344,7 +342,7 @@ export function Stage01LetterKnowledge({ onStageComplete }: Stage01Props) {
         </button>
 
         <span className="text-[11px] font-semibold text-slate-400">
-          Island 1 of 10
+          Island 9 of 10
         </span>
       </div>
     </div>
